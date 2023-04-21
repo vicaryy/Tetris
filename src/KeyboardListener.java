@@ -14,13 +14,21 @@ public class KeyboardListener implements KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             gamePanel.moveRight();
+            gamePanel.collisionToRight(false);
+            gamePanel.collisionBlocksOnBoardToRight();
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             gamePanel.moveLeft();
+            gamePanel.collisionToLeft(false);
+            gamePanel.collisionBlocksOnBoardToLeft();
         } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             gamePanel.moveDown();
-        }
-        else if(e.getKeyCode() == KeyEvent.VK_UP){
+            gamePanel.collisionToDown(false);
+            gamePanel.collisionBlocksOnBoard();
+        } else if (e.getKeyCode() == KeyEvent.VK_UP) {
             gamePanel.switchBlockDirection();
+            gamePanel.collisionToRight(true);
+            gamePanel.collisionToLeft(true);
+            gamePanel.collisionBlocksOnBoardToDown();
         }
     }
 
