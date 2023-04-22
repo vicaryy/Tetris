@@ -1,39 +1,38 @@
 import java.awt.event.*;
 
-public class KeyboardListener implements KeyListener {
+public class KeyboardListener extends KeyAdapter {
     GamePanel gamePanel;
-    KeyboardListener(GamePanel gamePanel){
-        this.gamePanel = gamePanel;
-    }
-    @Override
-    public void keyTyped(KeyEvent e) {
 
+    KeyboardListener(GamePanel gamePanel) {
+        this.gamePanel = gamePanel;
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            gamePanel.moveRight();
-            gamePanel.collisionToRight(false);
-            gamePanel.collisionBlocksOnBoardToRight();
-        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            gamePanel.moveLeft();
-            gamePanel.collisionToLeft(false);
-            gamePanel.collisionBlocksOnBoardToLeft();
-        } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            gamePanel.moveDown();
-            gamePanel.collisionToDown(false);
-            gamePanel.collisionBlocksOnBoard();
-        } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-            gamePanel.switchBlockDirection();
-            gamePanel.collisionToRight(true);
-            gamePanel.collisionToLeft(true);
-            gamePanel.collisionBlocksOnBoardToDown();
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_RIGHT -> {
+                gamePanel.moveRight();
+                gamePanel.collisionToRightWall(false);
+                gamePanel.collisionWithBlocksOnBoardToRight(false);
+            }
+            case KeyEvent.VK_LEFT -> {
+                gamePanel.moveLeft();
+                gamePanel.collisionToLeftWall(false);
+                gamePanel.collisionWithBlocksOnBoardToLeft(false);
+            }
+            case KeyEvent.VK_DOWN -> {
+                gamePanel.moveDown();
+                gamePanel.collisionToDownWall(false);
+                gamePanel.collisionWithBlocksOnBoard();
+            }
+            case KeyEvent.VK_UP -> {
+                gamePanel.switchBlockDirection();
+                gamePanel.collisionToRightWall(true);
+                gamePanel.collisionToLeftWall(true);
+                gamePanel.collisionToDownWallWhenSwitches();
+                gamePanel.collisionWithBlocksOnBoardWhenSwitches();
+            }
+            case KeyEvent.VK_SPACE -> gamePanel.moveDownInstant();
         }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
     }
 }

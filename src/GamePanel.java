@@ -4,9 +4,9 @@ import java.awt.event.*;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
-    UI ui = new UI(this);
-    Blocks blocks = new Blocks(this);
-    KeyboardListener keyboardListener = new KeyboardListener(this);
+    private UI ui = new UI(this);
+    private Blocks blocks = new Blocks(this);
+    private KeyboardListener keyboardListener = new KeyboardListener(this);
     private final int GAME_PANEL_WIDTH = 400;
     private final int GAME_PANEL_HEIGHT = 800;
     private final int FRAME_SIZE = 40;
@@ -40,25 +40,13 @@ public class GamePanel extends JPanel implements ActionListener {
         timer.start();
     }
 
-//    void collisionToWall(boolean right, boolean left, boolean down, boolean up) {
-//        for (int i = 0; i < block_x.length; i++) {
-//            if (block_x[i] == GAME_PANEL_WIDTH
-//                    || block_x[i] == -FRAME_SIZE
-//                    || block_y[i] == GAME_PANEL_HEIGHT) {
-//                for (int k = 0; k < block_x.length; k++) {
-//                    block_x[k] += right ? -FRAME_SIZE : left ? FRAME_SIZE : 0;
-//                    block_y[k] += down ? -FRAME_SIZE : 0;
-//                }
-//            }
-//        }
-//    }
 
-    void collisionToRight(boolean up){
+    void collisionToRightWall(boolean upKey){
         for(int i = 0; i < block_x.length; i++){
             if(block_x[i] == GAME_PANEL_WIDTH){
                 for(int k = 0; k < block_x.length; k++){
                     block_x[k] -= FRAME_SIZE;
-                    if(typeOfBlock == 0 && typeOfBlockDirection == 0 && up){
+                    if(typeOfBlock == 0 && typeOfBlockDirection == 0 && upKey){
                         block_x[k] -= FRAME_SIZE;
                     }
                 }
@@ -67,12 +55,12 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void collisionToLeft(boolean up){
+    void collisionToLeftWall(boolean upKey){
         for(int i = 0; i < block_x.length; i++){
             if(block_x[i] == -FRAME_SIZE){
                 for(int k = 0; k < block_x.length; k++){
                     block_x[k] += FRAME_SIZE;
-                    if(typeOfBlock == 0 && typeOfBlockDirection == 2 && up){
+                    if(typeOfBlock == 0 && typeOfBlockDirection == 2 && upKey){
                         block_x[k] += FRAME_SIZE;
                     }
                 }
@@ -81,7 +69,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void collisionToDown(boolean up) {
+    void collisionToDownWall(boolean upKey) {
         for (int i = 0; i < block_y.length; i++) {
             if (block_y[i] == GAME_PANEL_HEIGHT) {
                 collision = true;
@@ -92,52 +80,115 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void collisionBlocksOnBoardToRight(){
-        int y1 = ((block_y[0] * 10) + block_x[0]) / 40;
-        int y2 = ((block_y[1] * 10) + block_x[1]) / 40;
-        int y3 = ((block_y[2] * 10) + block_x[2]) / 40;
-        int y4 = ((block_y[3] * 10) + block_x[3]) / 40;
-        if (boardBlocks[y1]
-                || boardBlocks[y2]
-                || boardBlocks[y3]
-                || boardBlocks[y4]) {
+    void collisionToDownWallWhenSwitches() {
+        for (int i = 0; i < block_y.length; i++) {
+            if (block_y[i] == GAME_PANEL_HEIGHT) {
+                for (int k = 0; k < block_y.length; k++) {
+                    block_y[k] -= FRAME_SIZE;
+                    if (typeOfBlock == 0 && typeOfBlockDirection == 1) {
+                        block_y[k] -= FRAME_SIZE;
+                    }
+                }
+            }
+        }
+    }
+
+    void collisionWithBlocksOnBoardToRight(boolean upKey){
+        int x1 = ((block_y[0] * 10) + block_x[0]) / 40;
+        int x2 = ((block_y[1] * 10) + block_x[1]) / 40;
+        int x3 = ((block_y[2] * 10) + block_x[2]) / 40;
+        int x4 = ((block_y[3] * 10) + block_x[3]) / 40;
+        if (boardBlocks[x1]
+                || boardBlocks[x2]
+                || boardBlocks[x3]
+                || boardBlocks[x4]) {
             for(int i = 0; i < block_x.length; i++){
                 block_x[i] -= FRAME_SIZE;
+                if (typeOfBlock == 0 && typeOfBlockDirection == 0 && upKey) {
+                    block_x[i] -= FRAME_SIZE;
+                }
             }
         }
     }
 
-    void collisionBlocksOnBoardToLeft(){
-        int y1 = ((block_y[0] * 10) + block_x[0]) / 40;
-        int y2 = ((block_y[1] * 10) + block_x[1]) / 40;
-        int y3 = ((block_y[2] * 10) + block_x[2]) / 40;
-        int y4 = ((block_y[3] * 10) + block_x[3]) / 40;
-        if (boardBlocks[y1]
-                || boardBlocks[y2]
-                || boardBlocks[y3]
-                || boardBlocks[y4]) {
+    void collisionWithBlocksOnBoardToLeft(boolean upKey){
+        int x1 = ((block_y[0] * 10) + block_x[0]) / 40;
+        int x2 = ((block_y[1] * 10) + block_x[1]) / 40;
+        int x3 = ((block_y[2] * 10) + block_x[2]) / 40;
+        int x4 = ((block_y[3] * 10) + block_x[3]) / 40;
+        if (boardBlocks[x1]
+                || boardBlocks[x2]
+                || boardBlocks[x3]
+                || boardBlocks[x4]) {
             for(int i = 0; i < block_x.length; i++){
                 block_x[i] += FRAME_SIZE;
+                if (typeOfBlock == 0 && typeOfBlockDirection == 2 && upKey) {
+                    block_x[i] += FRAME_SIZE;
+                }
             }
         }
     }
 
-    void collisionBlocksOnBoardToDown(){
-        int y1 = ((block_y[0] * 10) + block_x[0]) / 40;
-        int y2 = ((block_y[1] * 10) + block_x[1]) / 40;
-        int y3 = ((block_y[2] * 10) + block_x[2]) / 40;
-        int y4 = ((block_y[3] * 10) + block_x[3]) / 40;
-        if (boardBlocks[y1]
-                || boardBlocks[y2]
-                || boardBlocks[y3]
-                || boardBlocks[y4]) {
-            for(int i = 0; i < block_y.length; i++){
-                block_y[i] -= FRAME_SIZE;
+    void collisionWithBlocksOnBoardWhenSwitches() {
+        int x1 = ((block_y[0] * 10) + block_x[0]) / 40;
+        int x2 = ((block_y[1] * 10) + block_x[1]) / 40;
+        int x3 = ((block_y[2] * 10) + block_x[2]) / 40;
+        int x4 = ((block_y[3] * 10) + block_x[3]) / 40;
+        if (boardBlocks[x1]
+                || boardBlocks[x2]
+                || boardBlocks[x3]
+                || boardBlocks[x4]) {
+            for (int i = 0; i < block_x.length; i++) {
+                block_x[i] -= FRAME_SIZE;
+            }
+
+
+            x1 = ((block_y[0] * 10) + block_x[0]) / 40;
+            x2 = ((block_y[1] * 10) + block_x[1]) / 40;
+            x3 = ((block_y[2] * 10) + block_x[2]) / 40;
+            x4 = ((block_y[3] * 10) + block_x[3]) / 40;
+            if (boardBlocks[x1]
+                    || boardBlocks[x2]
+                    || boardBlocks[x3]
+                    || boardBlocks[x4]) {
+                for (int i = 0; i < block_x.length; i++) {
+                    block_x[i] += FRAME_SIZE * 2;
+                }
+
+
+                x1 = ((block_y[0] * 10) + block_x[0]) / 40;
+                x2 = ((block_y[1] * 10) + block_x[1]) / 40;
+                x3 = ((block_y[2] * 10) + block_x[2]) / 40;
+                x4 = ((block_y[3] * 10) + block_x[3]) / 40;
+                if (boardBlocks[x1]
+                        || boardBlocks[x2]
+                        || boardBlocks[x3]
+                        || boardBlocks[x4]) {
+                    for (int i = 0; i < block_x.length; i++) {
+                        block_x[i] -= FRAME_SIZE;
+                        block_y[i] -= FRAME_SIZE;
+                    }
+
+
+                    x1 = ((block_y[0] * 10) + block_x[0]) / 40;
+                    x2 = ((block_y[1] * 10) + block_x[1]) / 40;
+                    x3 = ((block_y[2] * 10) + block_x[2]) / 40;
+                    x4 = ((block_y[3] * 10) + block_x[3]) / 40;
+                    if (boardBlocks[x1]
+                            || boardBlocks[x2]
+                            || boardBlocks[x3]
+                            || boardBlocks[x4]) {
+                        for (int i = 0; i < block_x.length; i++) {
+                            block_y[i] += FRAME_SIZE;
+                            if (i != 0) switchBlockDirection();
+                        }
+                    }
+                }
             }
         }
     }
 
-    void collisionBlocksOnBoard() {
+    void collisionWithBlocksOnBoard() {
         int y1 = ((block_y[0] * 10) + block_x[0]) / 40;
         int y2 = ((block_y[1] * 10) + block_x[1]) / 40;
         int y3 = ((block_y[2] * 10) + block_x[2]) / 40;
@@ -155,12 +206,9 @@ public class GamePanel extends JPanel implements ActionListener {
     void addBlockToBoard() {
         for (int i = 0; i < block_y.length; i++) {
             block_y[i] -= FRAME_SIZE;
-        }
-        for (int i = 0; i < block_x.length; i++) {
             boardBlocks[((block_y[i] * 10) + block_x[i]) / 40] = true;
         }
     }
-
 
     void newBlock() {
         typeOfBlock = random.nextInt(0,7);
@@ -168,13 +216,13 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     void moveBlock() {
-        if (System.currentTimeMillis() - currentTime > 100000) {
+        if (System.currentTimeMillis() - currentTime > 1000) {
             for (int i = 0; i < block_y.length; i++) {
                 block_y[i] += FRAME_SIZE;
             }
             currentTime = System.currentTimeMillis();
-            collisionToDown(false);
-            collisionBlocksOnBoard();
+            collisionToDownWall(false);
+            collisionWithBlocksOnBoard();
         }
     }
 
@@ -201,12 +249,21 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    void moveDownInstant() {
+        collision = false;
+        do {
+            moveDown();
+            collisionToDownWall(false);
+            collisionWithBlocksOnBoard();
+        } while (!collision);
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        //ui.drawNet(g2d);
+        ui.drawNet(g2d);
 
         ui.drawMobileBlock(g2d, block_x, block_y);
 

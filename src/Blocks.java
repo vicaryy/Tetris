@@ -127,7 +127,7 @@ public class Blocks {
                     //   +
 
 
-                    // WYJATEK -------------------------------------------------------- w osi X PRAWEJ - FRAMESIZE
+                    // WYJATEK -------------------------------------------------------- w osi X PRAWEJ - FRAMESIZE - DONE
                     // 1 2 3 4
                     //
                     // + = = =
@@ -142,10 +142,9 @@ public class Blocks {
                     gamePanel.block_y[1] -= FRAME_SIZE;
                     gamePanel.block_y[2] = block_y[2];
                     gamePanel.block_y[3] += FRAME_SIZE;
-                }
-                else if(typeOfBlockDirection == 1){
+                } else if (typeOfBlockDirection == 1) {
 
-                    // WYJATEK -------------------------------------------------------- w osi Y DOL ( -FRAME * 2)
+                    // WYJATEK -------------------------------------------------------- w osi Y DOL ( -FRAME * 2) - DONE
 
                     // 1 2 3 4
                     //     +
@@ -161,10 +160,9 @@ public class Blocks {
                     gamePanel.block_y[1] = block_y[1];
                     gamePanel.block_y[2] += FRAME_SIZE;
                     gamePanel.block_y[3] += FRAME_SIZE * 2;
-                }
-                else if(typeOfBlockDirection == 2){
+                } else if (typeOfBlockDirection == 2) {
 
-                    // WYJATEK -------------------------------------------------------- w osi X LEWO + FRAMESIZE
+                    // WYJATEK -------------------------------------------------------- w osi X LEWO + FRAMESIZE - DONE
 
                     // 1 2 3 4
                     //
@@ -180,10 +178,9 @@ public class Blocks {
                     gamePanel.block_y[1] += FRAME_SIZE;
                     gamePanel.block_y[2] = block_y[2];
                     gamePanel.block_y[3] -= FRAME_SIZE;
-                }
-                else if(typeOfBlockDirection == 3){
+                } else if (typeOfBlockDirection == 3) {
 
-                    // WYJATEK -------------------------------------------------------- w osi Y dół (- FRAME)
+                    // WYJATEK -------------------------------------------------------- w osi Y dół (- FRAME) - DONE
                     // 1 2 3 4
                     //   =
                     //   =
