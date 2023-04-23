@@ -23,7 +23,7 @@ public class MainPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setPaint(new Color(170,170,170));
         g2d.setStroke(new BasicStroke(3));
-        g2d.drawRect(18,18,403,803);
+        g2d.drawRect(18,18, gamePanel.getGAME_PANEL_WIDTH() + 3, gamePanel.getGAME_PANEL_HEIGHT() + 3);
     }
 
 }
