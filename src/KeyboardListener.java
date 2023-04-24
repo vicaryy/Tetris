@@ -9,7 +9,7 @@ public class KeyboardListener extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (!gamePanel.pause) {
+        if (!gamePanel.pauseForTetris) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_RIGHT -> {
                     gamePanel.moveRight();

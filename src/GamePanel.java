@@ -15,6 +15,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private final int FRAME_SIZE = GAME_PANEL_WIDTH / 10;
     private int typeOfBlock;
     private int typeOfBlockDirection = 0;
+    private int score = 0;
     private long currentTime;
     int[] block_x = new int[4];
     int[] block_y = new int[4];
@@ -22,34 +23,41 @@ public class GamePanel extends JPanel implements ActionListener {
     int[] invisibleBlock_y = new int[4];
     private final boolean[] boardBlocks = new boolean[FRAME_AMOUNT];
     private boolean collision;
-    boolean pause;
+    boolean pauseForTetris;
     Timer timer;
-    Timer tetrisTimer;
     Random random;
     List<Integer> tetrisRows;
     Color backgroundColor;
 
     GamePanel() {
 
-        boardBlocks[190] = true;
-        boardBlocks[191] = true;
-        boardBlocks[192] = true;
-        boardBlocks[193] = true;
-        boardBlocks[194] = true;
-        boardBlocks[195] = true;
-        boardBlocks[196] = true;
-        boardBlocks[197] = true;
-        boardBlocks[198] = true;
-
-        boardBlocks[170] = true;
-        boardBlocks[171] = true;
-        boardBlocks[172] = true;
-        boardBlocks[173] = true;
-        boardBlocks[174] = true;
-        boardBlocks[175] = true;
-        boardBlocks[176] = true;
-        boardBlocks[177] = true;
-        boardBlocks[178] = true;
+//        boardBlocks[190] = true;
+//        boardBlocks[191] = true;
+//        boardBlocks[192] = true;
+//        boardBlocks[193] = true;
+//        boardBlocks[194] = true;
+//        boardBlocks[195] = true;
+//        boardBlocks[196] = true;
+//        boardBlocks[197] = true;
+//        boardBlocks[198] = true;
+//
+//        boardBlocks[182] = true;
+//        boardBlocks[183] = true;
+//        boardBlocks[184] = true;
+//
+//        boardBlocks[170] = true;
+//        boardBlocks[171] = true;
+//        boardBlocks[172] = true;
+//        boardBlocks[173] = true;
+//        boardBlocks[174] = true;
+//        boardBlocks[175] = true;
+//        boardBlocks[176] = true;
+//        boardBlocks[177] = true;
+//        boardBlocks[178] = true;
+//
+//        boardBlocks[162] = true;
+//        boardBlocks[163] = true;
+//        boardBlocks[164] = true;
 
 
         random = new Random();
@@ -286,7 +294,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     void newBlock() {
-        typeOfBlock = random.nextInt(0,1);
+        typeOfBlock = random.nextInt(0,7);
         blocks.newBlock(typeOfBlock, typeOfBlockDirection, FRAME_SIZE);
         collisionForInvisibleBlock();
         checkTetris();
@@ -354,17 +362,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 if (tetrisRows.size() == 4) break;
             }
         }
-
-        if (tetris) {
-            timer.stop();
-            pause = true;
-            tetrisTimer = new Timer(100, e -> {
-                repaint();
-                if (ui.complete)
-                    resettingAfterTetris();
-            });
-            tetrisTimer.start();
-        }
+        if (tetris) pauseForTetris = true;
     }
 
     void resettingAfterTetris(){
@@ -373,12 +371,38 @@ public class GamePanel extends JPanel implements ActionListener {
                 boardBlocks[(tetrisRows.get(i)*10)+k] = false;
             }
         }
-        tetrisTimer.stop();
-        timer.start();
-        pause = false;
-        ui.complete = false;
+        runningDownBlocksAfterTetris();
+        pauseForTetris = false;
         ui.animation = 0;
         tetrisRows.clear();
+        collisionForInvisibleBlock();
+    }
+
+    void runningDownBlocksAfterTetris() {
+        boolean normal = false;
+        for (int i = 1; i < tetrisRows.size(); i++) {
+            if (tetrisRows.get(0) - tetrisRows.get(i) != -i) normal = false;
+        }
+        System.out.println(normal);
+
+        if (normal) {
+            for (int i = tetrisRows.get(0) * 10; i > 0; i--) {
+                if (boardBlocks[i]) {
+                    boardBlocks[i] = false;
+                    boardBlocks[i + (tetrisRows.size() * 10)] = true;
+                }
+            }
+        }
+        if (!normal) {
+            for(int i = 0; i < tetrisRows.size(); i++){
+                for(int k = tetrisRows.get(i) * 10; k > 0; k--){
+                    if (boardBlocks[k]) {
+                        boardBlocks[k] = false;
+                        boardBlocks[k + 10] = true;
+                    }
+                }
+            }
+        }
     }
 
 
@@ -389,20 +413,20 @@ public class GamePanel extends JPanel implements ActionListener {
 
         //ui.drawNet(g2d);
 
-        ui.drawMobileBlock(g2d, block_x, block_y);
+        if (!pauseForTetris) ui.drawMobileBlock(g2d, block_x, block_y);
 
         ui.drawBoardBlock(g2d, boardBlocks);
 
-        ui.drawInvisibleBlock(g2d, invisibleBlock_x, invisibleBlock_y);
+        if (!pauseForTetris) ui.drawInvisibleBlock(g2d, invisibleBlock_x, invisibleBlock_y);
 
-        if (pause) ui.drawAnimationForTetris(g2d, tetrisRows);
+        if (pauseForTetris) ui.drawAnimationForTetris(g2d, tetrisRows);
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         repaint();
-        moveBlock();
+        if (!pauseForTetris) moveBlock();
     }
 
 
