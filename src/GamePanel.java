@@ -9,10 +9,12 @@ public class GamePanel extends JPanel implements ActionListener {
     private UI ui = new UI(this);
     private Blocks blocks = new Blocks(this);
     private KeyboardListener keyboardListener = new KeyboardListener(this);
+    private InterfacePanel interfacePanel = new InterfacePanel(this);
     private final int GAME_PANEL_WIDTH = 400;
-    private final int GAME_PANEL_HEIGHT = 800;
-    private final int FRAME_AMOUNT = 200;
+    private final int GAME_PANEL_HEIGHT = GAME_PANEL_WIDTH * 2;
+    private final int FRAME_AMOUNT = 400;
     private final int FRAME_SIZE = GAME_PANEL_WIDTH / 10;
+    private final int PANELS_DISTANCE = GAME_PANEL_WIDTH / 20;
     private int typeOfBlock;
     private int typeOfBlockDirection = 0;
     private int score = 0;
@@ -55,9 +57,15 @@ public class GamePanel extends JPanel implements ActionListener {
 //        boardBlocks[177] = true;
 //        boardBlocks[178] = true;
 //
+//        boardBlocks[160] = true;
+//        boardBlocks[161] = true;
 //        boardBlocks[162] = true;
 //        boardBlocks[163] = true;
 //        boardBlocks[164] = true;
+//        boardBlocks[165] = true;
+//        boardBlocks[166] = true;
+//        boardBlocks[167] = true;
+//        boardBlocks[168] = true;
 
 
         random = new Random();
@@ -65,7 +73,7 @@ public class GamePanel extends JPanel implements ActionListener {
         backgroundColor = new Color(10,20,20);
 
         this.setBackground(backgroundColor);
-        this.setBounds(20, 20, GAME_PANEL_WIDTH, GAME_PANEL_HEIGHT);
+        this.setBounds(PANELS_DISTANCE, PANELS_DISTANCE, GAME_PANEL_WIDTH, GAME_PANEL_HEIGHT);
         this.setFocusable(true);
         this.addKeyListener(keyboardListener);
 
@@ -365,6 +373,17 @@ public class GamePanel extends JPanel implements ActionListener {
         if (tetris) pauseForTetris = true;
     }
 
+    void runningDownBlocksAfterTetris() {
+        for (int i = 0; i < tetrisRows.size(); i++) {
+            for (int k = tetrisRows.get(i) * 10; k > 0; k--) {
+                if (boardBlocks[k]) {
+                    boardBlocks[k] = false;
+                    boardBlocks[k + 10] = true;
+                }
+            }
+        }
+    }
+
     void resettingAfterTetris(){
         for(int i = 0; i < tetrisRows.size(); i++){
             for(int k = 0; k < 10; k++){
@@ -378,33 +397,6 @@ public class GamePanel extends JPanel implements ActionListener {
         collisionForInvisibleBlock();
     }
 
-    void runningDownBlocksAfterTetris() {
-        boolean normal = false;
-        for (int i = 1; i < tetrisRows.size(); i++) {
-            if (tetrisRows.get(0) - tetrisRows.get(i) != -i) normal = false;
-        }
-        System.out.println(normal);
-
-        if (normal) {
-            for (int i = tetrisRows.get(0) * 10; i > 0; i--) {
-                if (boardBlocks[i]) {
-                    boardBlocks[i] = false;
-                    boardBlocks[i + (tetrisRows.size() * 10)] = true;
-                }
-            }
-        }
-        if (!normal) {
-            for(int i = 0; i < tetrisRows.size(); i++){
-                for(int k = tetrisRows.get(i) * 10; k > 0; k--){
-                    if (boardBlocks[k]) {
-                        boardBlocks[k] = false;
-                        boardBlocks[k + 10] = true;
-                    }
-                }
-            }
-        }
-    }
-
 
     @Override
     public void paintComponent(Graphics g) {
@@ -413,13 +405,13 @@ public class GamePanel extends JPanel implements ActionListener {
 
         //ui.drawNet(g2d);
 
-        if (!pauseForTetris) ui.drawMobileBlock(g2d, block_x, block_y);
+        if (!pauseForTetris) ui.drawMobileBlock(g2d, block_x, block_y, FRAME_SIZE);
 
-        ui.drawBoardBlock(g2d, boardBlocks);
+        ui.drawBoardBlock(g2d, boardBlocks, FRAME_SIZE);
 
-        if (!pauseForTetris) ui.drawInvisibleBlock(g2d, invisibleBlock_x, invisibleBlock_y);
+        if (!pauseForTetris) ui.drawInvisibleBlock(g2d, invisibleBlock_x, invisibleBlock_y, FRAME_SIZE);
 
-        if (pauseForTetris) ui.drawAnimationForTetris(g2d, tetrisRows);
+        if (pauseForTetris) ui.drawAnimationForTetris(g2d, tetrisRows, GAME_PANEL_WIDTH, FRAME_SIZE);
 
     }
 
@@ -440,6 +432,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public int getFRAME_SIZE() {
         return FRAME_SIZE;
+    }
+
+    public int getPANELS_DISTANCE() {
+        return PANELS_DISTANCE;
     }
 
     public void setTypeOfBlockDirection(int typeOfBlockDirection) {

@@ -4,7 +4,7 @@ import java.awt.*;
 public class Frame extends JFrame {
     private final Color frameColor = new Color(24,23,23);
     private final GamePanel gamePanel = new GamePanel();
-    private final InterfacePanel interfacePanel = new InterfacePanel();
+    private final InterfacePanel interfacePanel = new InterfacePanel(gamePanel);
     private final MainPanel mainPanel = new MainPanel(this, gamePanel, interfacePanel);
 
     Frame(){
@@ -15,7 +15,7 @@ public class Frame extends JFrame {
         }
         this.setDefaultCloseOperation(3);
         this.setBackground(frameColor);
-        this.setResizable(true);
+        this.setResizable(false);
         this.add(mainPanel);
         this.pack();
         this.setLocationRelativeTo(null);

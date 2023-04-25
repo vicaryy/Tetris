@@ -10,15 +10,14 @@ public class UI {
         this.gamePanel = gamePanel;
     }
 
-    public void drawMobileBlock(Graphics2D g2d, int[] block_x, int[] block_y) {
-        g2d.setStroke(new BasicStroke(2));
+    public void drawMobileBlock(Graphics2D g2d, int[] block_x, int[] block_y, int FRAME_SIZE) {
+        g2d.setStroke(new BasicStroke(gamePanel.getGAME_PANEL_WIDTH()/200));
         for (int i = 0; i < block_x.length; i++) {
             g2d.setPaint(Color.RED);
-            g2d.fillRect(block_x[i], block_y[i], gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
+            g2d.fillRect(block_x[i], block_y[i], FRAME_SIZE, FRAME_SIZE);
             g2d.setPaint(Color.BLACK);
-            g2d.drawRect(block_x[i], block_y[i], gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
+            g2d.drawRect(block_x[i], block_y[i], FRAME_SIZE, FRAME_SIZE);
         }
-        g2d.setPaint(null);
     }
 
     public void drawNet(Graphics2D g2d) {
@@ -30,16 +29,16 @@ public class UI {
         }
     }
 
-    public void drawInvisibleBlock(Graphics2D g2d, int[] invisibleBlock_x, int[] invisibleBlock_y) {
-        g2d.setStroke(new BasicStroke(2));
+    public void drawInvisibleBlock(Graphics2D g2d, int[] invisibleBlock_x, int[] invisibleBlock_y, int FRAME_SIZE) {
+        g2d.setStroke(new BasicStroke(gamePanel.getGAME_PANEL_WIDTH()/200));
         g2d.setPaint(new Color(150, 150, 150));
         for (int i = 0; i < invisibleBlock_y.length; i++) {
-            g2d.drawRect(invisibleBlock_x[i], invisibleBlock_y[i], gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
+            g2d.drawRect(invisibleBlock_x[i], invisibleBlock_y[i], FRAME_SIZE, FRAME_SIZE);
         }
     }
 
-    public void drawBoardBlock(Graphics2D g2d, boolean[] boardBlocks) {
-        g2d.setStroke(new BasicStroke(2));
+    public void drawBoardBlock(Graphics2D g2d, boolean[] boardBlocks, int FRAME_SIZE) {
+        g2d.setStroke(new BasicStroke(gamePanel.getGAME_PANEL_WIDTH()/200));
         for (int i = 0; i < boardBlocks.length; i++) {
             if (boardBlocks[i]) {
                 int x;
@@ -52,30 +51,28 @@ public class UI {
                     x = i;
                 }
                 g2d.setPaint(Color.RED);
-                g2d.fillRect(x * gamePanel.getFRAME_SIZE(), y * gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
+                g2d.fillRect(x * FRAME_SIZE, y * FRAME_SIZE, FRAME_SIZE, FRAME_SIZE);
                 g2d.setPaint(Color.BLACK);
-                g2d.drawRect(x * gamePanel.getFRAME_SIZE(), y * gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
+                g2d.drawRect(x * FRAME_SIZE, y * FRAME_SIZE, FRAME_SIZE, FRAME_SIZE);
             }
         }
     }
 
-    public void drawAnimationForTetris(Graphics2D g2d, List<Integer> tetrisRows) {
+    public void drawAnimationForTetris(Graphics2D g2d, List<Integer> tetrisRows, int GAME_PANEL_WIDTH, int FRAME_SIZE) {
+        gamePanel.backgroundColor = tetrisRows.size() == 4 && (animation == FRAME_SIZE || animation == FRAME_SIZE * 3 || animation == FRAME_SIZE * 5) ? new Color(230, 230, 230) : new Color(10, 20, 20);
+        gamePanel.setBackground(gamePanel.backgroundColor);
         g2d.setPaint(gamePanel.backgroundColor);
 
         for (int i = 0; i < tetrisRows.size(); i++) {
-            g2d.fillRect((gamePanel.getGAME_PANEL_WIDTH() / 2) - animation, tetrisRows.get(i) * gamePanel.getFRAME_SIZE(), animation * 2, gamePanel.getFRAME_SIZE());
+            g2d.fillRect((GAME_PANEL_WIDTH / 2) - animation, tetrisRows.get(i) * FRAME_SIZE, animation * 2, FRAME_SIZE);
         }
 
         if (System.currentTimeMillis() - currentTime > 80) {
-            animation += gamePanel.getFRAME_SIZE();
+            animation += FRAME_SIZE;
             currentTime = System.currentTimeMillis();
-            if (tetrisRows.size() == 4 && (animation == gamePanel.getFRAME_SIZE() || animation == gamePanel.getFRAME_SIZE() * 3 || animation == gamePanel.getFRAME_SIZE() * 5))
-                gamePanel.backgroundColor = new Color(230, 230, 230);
-            else
-                gamePanel.backgroundColor = new Color(10, 20, 20);
         }
-        if (animation > gamePanel.getGAME_PANEL_WIDTH() / 2)
+
+        if (animation > (GAME_PANEL_WIDTH / 2) + FRAME_SIZE)
             gamePanel.resettingAfterTetris();
-        gamePanel.setBackground(gamePanel.backgroundColor);
     }
 }
