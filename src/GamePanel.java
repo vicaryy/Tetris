@@ -1,23 +1,26 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
     private UI ui = new UI(this);
     private Blocks blocks = new Blocks(this);
     private KeyboardListener keyboardListener = new KeyboardListener(this);
     private InterfacePanel interfacePanel = new InterfacePanel(this);
+    private NextBlockPanel nextBlockPanel = new NextBlockPanel(this);
     private final int GAME_PANEL_WIDTH = 400;
     private final int GAME_PANEL_HEIGHT = GAME_PANEL_WIDTH * 2;
     private final int FRAME_AMOUNT = 400;
     private final int FRAME_SIZE = GAME_PANEL_WIDTH / 10;
     private final int PANELS_DISTANCE = GAME_PANEL_WIDTH / 20;
-    private int typeOfBlock;
+    private int [] typeOfBlocks = {-1,-1};
     private int typeOfBlockDirection = 0;
     private int score = 0;
+    private int level = 15;
+    private int line = 27;
     private long currentTime;
     int[] block_x = new int[4];
     int[] block_y = new int[4];
@@ -27,9 +30,10 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean collision;
     boolean pauseForTetris;
     Timer timer;
-    Random random;
+    SecureRandom random;
     List<Integer> tetrisRows;
     Color backgroundColor;
+    Color mainPanelColor = new Color(24,23,23);
 
     GamePanel() {
 
@@ -68,9 +72,9 @@ public class GamePanel extends JPanel implements ActionListener {
 //        boardBlocks[168] = true;
 
 
-        random = new Random();
+        //random = new Random();
         tetrisRows = new ArrayList<>();
-        backgroundColor = new Color(10,20,20);
+        backgroundColor = new Color(10, 20, 20);
 
         this.setBackground(backgroundColor);
         this.setBounds(PANELS_DISTANCE, PANELS_DISTANCE, GAME_PANEL_WIDTH, GAME_PANEL_HEIGHT);
@@ -88,12 +92,12 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
 
-    void collisionToRightWall(boolean upKey){
-        for(int i = 0; i < block_x.length; i++){
-            if(block_x[i] == GAME_PANEL_WIDTH){
-                for(int k = 0; k < block_x.length; k++){
+    void collisionToRightWall(boolean upKey) {
+        for (int i = 0; i < block_x.length; i++) {
+            if (block_x[i] == GAME_PANEL_WIDTH) {
+                for (int k = 0; k < block_x.length; k++) {
                     block_x[k] -= FRAME_SIZE;
-                    if(typeOfBlock == 0 && typeOfBlockDirection == 0 && upKey){
+                    if (typeOfBlocks[0] == 0 && typeOfBlockDirection == 0 && upKey) {
                         block_x[k] -= FRAME_SIZE;
                     }
                 }
@@ -102,12 +106,12 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void collisionToLeftWall(boolean upKey){
-        for(int i = 0; i < block_x.length; i++){
-            if(block_x[i] == -FRAME_SIZE){
-                for(int k = 0; k < block_x.length; k++){
+    void collisionToLeftWall(boolean upKey) {
+        for (int i = 0; i < block_x.length; i++) {
+            if (block_x[i] == -FRAME_SIZE) {
+                for (int k = 0; k < block_x.length; k++) {
                     block_x[k] += FRAME_SIZE;
-                    if(typeOfBlock == 0 && typeOfBlockDirection == 2 && upKey){
+                    if (typeOfBlocks[0] == 0 && typeOfBlockDirection == 2 && upKey) {
                         block_x[k] += FRAME_SIZE;
                     }
                 }
@@ -172,7 +176,7 @@ public class GamePanel extends JPanel implements ActionListener {
             if (block_y[i] == GAME_PANEL_HEIGHT) {
                 for (int k = 0; k < block_y.length; k++) {
                     block_y[k] -= FRAME_SIZE;
-                    if (typeOfBlock == 0 && typeOfBlockDirection == 1) {
+                    if (typeOfBlocks[0] == 0 && typeOfBlockDirection == 1) {
                         block_y[k] -= FRAME_SIZE;
                     }
                 }
@@ -180,7 +184,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void collisionWithBlocksOnBoardToRight(boolean upKey){
+    void collisionWithBlocksOnBoardToRight(boolean upKey) {
         int x1 = ((block_y[0] * 10) + block_x[0]) / FRAME_SIZE;
         int x2 = ((block_y[1] * 10) + block_x[1]) / FRAME_SIZE;
         int x3 = ((block_y[2] * 10) + block_x[2]) / FRAME_SIZE;
@@ -189,16 +193,16 @@ public class GamePanel extends JPanel implements ActionListener {
                 || boardBlocks[x2]
                 || boardBlocks[x3]
                 || boardBlocks[x4]) {
-            for(int i = 0; i < block_x.length; i++){
+            for (int i = 0; i < block_x.length; i++) {
                 block_x[i] -= FRAME_SIZE;
-                if (typeOfBlock == 0 && typeOfBlockDirection == 0 && upKey) {
+                if (typeOfBlocks[0] == 0 && typeOfBlockDirection == 0 && upKey) {
                     block_x[i] -= FRAME_SIZE;
                 }
             }
         }
     }
 
-    void collisionWithBlocksOnBoardToLeft(boolean upKey){
+    void collisionWithBlocksOnBoardToLeft(boolean upKey) {
         int x1 = ((block_y[0] * 10) + block_x[0]) / FRAME_SIZE;
         int x2 = ((block_y[1] * 10) + block_x[1]) / FRAME_SIZE;
         int x3 = ((block_y[2] * 10) + block_x[2]) / FRAME_SIZE;
@@ -207,9 +211,9 @@ public class GamePanel extends JPanel implements ActionListener {
                 || boardBlocks[x2]
                 || boardBlocks[x3]
                 || boardBlocks[x4]) {
-            for(int i = 0; i < block_x.length; i++){
+            for (int i = 0; i < block_x.length; i++) {
                 block_x[i] += FRAME_SIZE;
-                if (typeOfBlock == 0 && typeOfBlockDirection == 2 && upKey) {
+                if (typeOfBlocks[0] == 0 && typeOfBlockDirection == 2 && upKey) {
                     block_x[i] += FRAME_SIZE;
                 }
             }
@@ -291,21 +295,28 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     void addBlockToBoard() {
-        try {
-            for (int i = 0; i < block_y.length; i++) {
-                block_y[i] -= FRAME_SIZE;
-                boardBlocks[((block_y[i] * 10) + block_x[i]) / FRAME_SIZE] = true;
-            }
-        }catch(Exception e){
-            System.out.println("SKUCHA");
+        for (int i = 0; i < block_y.length; i++) {
+            block_y[i] -= FRAME_SIZE;
+            boardBlocks[((block_y[i] * 10) + block_x[i]) / FRAME_SIZE] = true;
         }
     }
 
     void newBlock() {
-        typeOfBlock = random.nextInt(0,7);
-        blocks.newBlock(typeOfBlock, typeOfBlockDirection, FRAME_SIZE);
+        random = new SecureRandom();
+        generatingNumbersForTypeOfBlocks();
+        blocks.newBlock(typeOfBlocks[0], FRAME_SIZE);
         collisionForInvisibleBlock();
         checkTetris();
+        score++;
+    }
+
+    void generatingNumbersForTypeOfBlocks() {
+        if (typeOfBlocks[0] == -1)
+            typeOfBlocks[0] = random.nextInt(0, 7);
+        else
+            typeOfBlocks[0] = typeOfBlocks[1];
+
+        typeOfBlocks[1] = random.nextInt(0, 7);
     }
 
     void moveBlock() {
@@ -319,24 +330,24 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void switchBlockDirection(){
+    void switchBlockDirection() {
         typeOfBlockDirection++;
-        blocks.switchBlockDirection(block_x, block_y, typeOfBlock, typeOfBlockDirection, FRAME_SIZE);
+        blocks.switchBlockDirection(block_x, block_y, typeOfBlocks[0], typeOfBlockDirection, FRAME_SIZE);
     }
 
-    void moveRight(){
+    void moveRight() {
         for (int i = 0; i < block_x.length; i++) {
             block_x[i] += FRAME_SIZE;
         }
     }
 
-    void moveLeft(){
+    void moveLeft() {
         for (int i = 0; i < block_x.length; i++) {
             block_x[i] -= FRAME_SIZE;
         }
     }
 
-    void moveDown(){
+    void moveDown() {
         for (int i = 0; i < block_y.length; i++) {
             block_y[i] += FRAME_SIZE;
         }
@@ -384,10 +395,10 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void resettingAfterTetris(){
-        for(int i = 0; i < tetrisRows.size(); i++){
-            for(int k = 0; k < 10; k++){
-                boardBlocks[(tetrisRows.get(i)*10)+k] = false;
+    void resettingAfterTetris() {
+        for (int i = 0; i < tetrisRows.size(); i++) {
+            for (int k = 0; k < 10; k++) {
+                boardBlocks[(tetrisRows.get(i) * 10) + k] = false;
             }
         }
         runningDownBlocksAfterTetris();
@@ -440,5 +451,21 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void setTypeOfBlockDirection(int typeOfBlockDirection) {
         this.typeOfBlockDirection = typeOfBlockDirection;
+    }
+
+    public int[] getTypeOfBlocks() {
+        return typeOfBlocks;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getLine() {
+        return line;
     }
 }

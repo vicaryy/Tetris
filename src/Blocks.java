@@ -4,7 +4,7 @@ public class Blocks {
         this.gamePanel = gamePanel;
     }
 
-    public void newBlock(int blockNumber, int typeOfBlockDirection, int FRAME_SIZE){
+    public void newBlock(int blockNumber, int FRAME_SIZE){
 
         switch (blockNumber){
             case 0 -> {

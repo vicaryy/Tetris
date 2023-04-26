@@ -7,20 +7,33 @@ public class MainPanel extends JPanel {
     Frame frame;
     GamePanel gamePanel;
     InterfacePanel interfacePanel;
+    ScorePanel scorePanel;
+    NextBlockPanel nextBlockPanel;
+    LevelPanel levelPanel;
+    LinePanel linePanel;
 
     MainPanel(Frame frame, GamePanel gamePanel, InterfacePanel interfacePanel) {
         this.frame = frame;
         this.gamePanel = gamePanel;
         this.interfacePanel = interfacePanel;
 
+        scorePanel = new ScorePanel(gamePanel);
+        levelPanel = new LevelPanel(gamePanel);
+        linePanel = new LinePanel(gamePanel);
+        nextBlockPanel = new NextBlockPanel(gamePanel);
+
         MAIN_PANEL_WIDTH = gamePanel.getGAME_PANEL_WIDTH() + gamePanel.getGAME_PANEL_WIDTH() / 2 + gamePanel.getPANELS_DISTANCE() * 3;
         MAIN_PANEL_HEIGHT = gamePanel.getGAME_PANEL_HEIGHT() + gamePanel.getPANELS_DISTANCE() * 2;
 
         this.setPreferredSize(new Dimension(MAIN_PANEL_WIDTH, MAIN_PANEL_HEIGHT));
         this.setLayout(null);
-        this.setBackground(frame.getFrameColor());
+        this.setBackground(gamePanel.mainPanelColor);
         this.add(gamePanel);
-        this.add(interfacePanel);
+        this.add(scorePanel);
+        this.add(nextBlockPanel);
+        this.add(levelPanel);
+        this.add(linePanel);
+        //this.add(interfacePanel);
     }
 
     @Override
@@ -30,6 +43,6 @@ public class MainPanel extends JPanel {
         g2d.setPaint(new Color(170, 170, 170));
         g2d.setStroke(new BasicStroke(gamePanel.getGAME_PANEL_WIDTH() / 100));
         g2d.drawRect(gamePanel.getPANELS_DISTANCE() - 2, gamePanel.getPANELS_DISTANCE() - 2, gamePanel.getGAME_PANEL_WIDTH() + 4, gamePanel.getGAME_PANEL_HEIGHT() + 4);
-        g2d.drawRect(gamePanel.getGAME_PANEL_WIDTH() + gamePanel.getPANELS_DISTANCE() * 2 - 2, gamePanel.getPANELS_DISTANCE() * 8 - 2, interfacePanel.getINTERFACE_PANEL_WIDTH() + 4, interfacePanel.getINTERFACE_PANEL_HEIGHT() + 4);
+        //g2d.drawRect(gamePanel.getGAME_PANEL_WIDTH() + gamePanel.getPANELS_DISTANCE() * 2 - 2, gamePanel.getPANELS_DISTANCE() * 8 - 2, interfacePanel.getINTERFACE_PANEL_WIDTH() + 4, interfacePanel.getINTERFACE_PANEL_HEIGHT() + 4);
     }
 }
