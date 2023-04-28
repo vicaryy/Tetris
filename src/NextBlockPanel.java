@@ -8,6 +8,7 @@ public class NextBlockPanel extends JPanel {
     int nextBlockPanel_height;
     int nextBlockPanel_x;
     int nextBlockPanel_y;
+    int fontSize;
     GamePanel gamePanel;
     Timer timer;
 
@@ -18,20 +19,22 @@ public class NextBlockPanel extends JPanel {
         nextBlockPanel_height = gamePanel.getGAME_PANEL_HEIGHT() / 3;
         nextBlockPanel_x = gamePanel.getGAME_PANEL_WIDTH() + gamePanel.getPANELS_DISTANCE() * 2;
         nextBlockPanel_y = gamePanel.getPANELS_DISTANCE();
+        fontSize = gamePanel.getGAME_PANEL_WIDTH()/16;
 
         this.setBackground(gamePanel.mainPanelColor);
         this.setBounds(nextBlockPanel_x, nextBlockPanel_y, nextBlockPanel_width, nextBlockPanel_height);
 
         timer = new Timer(100, e -> {
-            repaint();
-            settingNextBlockCords();
-
+            if(gamePanel.isRunning()) {
+                repaint();
+                settingNextBlockCords();
+            }
         });
         timer.start();
     }
 
     void settingNextBlockCords() {
-        switch (gamePanel.getTypeOfBlocks()[1]) {
+        switch (gamePanel.getTetrisBlocks().get(1)) {
             case 0 -> {
                 // = = = =
                 //
@@ -153,8 +156,7 @@ public class NextBlockPanel extends JPanel {
             g2d.drawRect(nextBlock_x[i], nextBlock_y[i], gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
         }
         g2d.setPaint(new Color(130, 200, 200));
-        int fontsize = gamePanel.getGAME_PANEL_WIDTH()/16;
-        g2d.setFont(new Font("Helvetica Neue", 0, fontsize));
-        g2d.drawString("NEXT", 0, fontsize);
+        g2d.setFont(new Font("Helvetica Neue", 0, fontSize));
+        g2d.drawString("NEXT", 0, fontSize);
     }
 }

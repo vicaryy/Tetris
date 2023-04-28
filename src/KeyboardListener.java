@@ -2,6 +2,8 @@ import java.awt.event.*;
 
 public class KeyboardListener extends KeyAdapter {
     GamePanel gamePanel;
+    boolean up;
+    boolean space;
 
     KeyboardListener(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
@@ -29,15 +31,31 @@ public class KeyboardListener extends KeyAdapter {
                     gamePanel.collisionWithBlocksOnBoard();
                 }
                 case KeyEvent.VK_UP -> {
-                    gamePanel.switchBlockDirection();
-                    gamePanel.collisionToRightWall(true);
-                    gamePanel.collisionToLeftWall(true);
-                    gamePanel.collisionToDownWallWhenSwitching();
-                    gamePanel.collisionWithBlocksOnBoardWhenSwitching();
-                    gamePanel.collisionForInvisibleBlock();
+                    if (!up) {
+                        up = true;
+                        gamePanel.switchBlockDirection();
+                        gamePanel.collisionToRightWall(true);
+                        gamePanel.collisionToLeftWall(true);
+                        gamePanel.collisionToDownWallWhenSwitching();
+                        gamePanel.collisionWithBlocksOnBoardWhenSwitching();
+                        gamePanel.collisionForInvisibleBlock();
+                    }
                 }
-                case KeyEvent.VK_SPACE -> gamePanel.moveDownInstant();
+                case KeyEvent.VK_SPACE -> {
+                    if (!space) {
+                        space = true;
+                        gamePanel.moveDownInstant();
+                    }
+                }
             }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_SPACE -> space = false;
+            case KeyEvent.VK_UP -> up = false;
         }
     }
 }

@@ -67,7 +67,7 @@ public class UI {
             g2d.fillRect((GAME_PANEL_WIDTH / 2) - animation, tetrisRows.get(i) * FRAME_SIZE, animation * 2, FRAME_SIZE);
         }
 
-        if (System.currentTimeMillis() - currentTime > 80) {
+        if (System.currentTimeMillis() - currentTime > 100) {
             animation += FRAME_SIZE;
             currentTime = System.currentTimeMillis();
         }
