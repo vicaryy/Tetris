@@ -3,8 +3,8 @@ import java.awt.*;
 
 public class Frame extends JFrame {
     private final Color frameColor = new Color(24, 23, 23);
-    private GamePanel gamePanel;
-    private MainPanel mainPanel;
+    private final GamePanel gamePanel;
+    private final MainPanel mainPanel;
 
 
     Frame() {

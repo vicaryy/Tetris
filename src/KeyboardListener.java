@@ -4,7 +4,6 @@ public class KeyboardListener extends KeyAdapter {
     GamePanel gamePanel;
     boolean up;
     boolean space;
-
     KeyboardListener(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
     }
@@ -13,23 +12,9 @@ public class KeyboardListener extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
         if (!gamePanel.pauseForTetris) {
             switch (e.getKeyCode()) {
-                case KeyEvent.VK_RIGHT -> {
-                    gamePanel.moveRight();
-                    gamePanel.collisionToRightWall(false);
-                    gamePanel.collisionWithBlocksOnBoardToRight(false);
-                    gamePanel.collisionForInvisibleBlock();
-                }
-                case KeyEvent.VK_LEFT -> {
-                    gamePanel.moveLeft();
-                    gamePanel.collisionToLeftWall(false);
-                    gamePanel.collisionWithBlocksOnBoardToLeft(false);
-                    gamePanel.collisionForInvisibleBlock();
-                }
-                case KeyEvent.VK_DOWN -> {
-                    gamePanel.moveDown();
-                    gamePanel.collisionToDownWall(false);
-                    gamePanel.collisionWithBlocksOnBoard();
-                }
+                case KeyEvent.VK_RIGHT -> gamePanel.setMoveRight(true);
+                case KeyEvent.VK_LEFT -> gamePanel.setMoveLeft(true);
+                case KeyEvent.VK_DOWN -> gamePanel.setMoveDown(true);
                 case KeyEvent.VK_UP -> {
                     if (!up) {
                         up = true;
@@ -38,13 +23,13 @@ public class KeyboardListener extends KeyAdapter {
                         gamePanel.collisionToLeftWall(true);
                         gamePanel.collisionToDownWallWhenSwitching();
                         gamePanel.collisionWithBlocksOnBoardWhenSwitching();
-                        gamePanel.collisionForInvisibleBlock();
+                        gamePanel.setPositionForGhostBlock();
                     }
                 }
                 case KeyEvent.VK_SPACE -> {
                     if (!space) {
                         space = true;
-                        gamePanel.moveDownInstant();
+                        gamePanel.hardDrop();
                     }
                 }
             }
@@ -56,6 +41,9 @@ public class KeyboardListener extends KeyAdapter {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_SPACE -> space = false;
             case KeyEvent.VK_UP -> up = false;
+            case KeyEvent.VK_DOWN -> gamePanel.setMoveDown(false);
+            case KeyEvent.VK_RIGHT -> gamePanel.setMoveRight(false);
+            case KeyEvent.VK_LEFT -> gamePanel.setMoveLeft(false);
         }
     }
 }
