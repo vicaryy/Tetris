@@ -1,10 +1,13 @@
+import javax.swing.text.AttributeSet;
 import java.awt.*;
 import java.util.List;
 
 public class UI {
     GamePanel gamePanel;
     int animation = 0;
+    int transparency = 200;
     long currentTime = System.currentTimeMillis();
+    long highlightTime = System.currentTimeMillis();
     Color lightBlue_0;
     Color darkBlue_1;
     Color orange_2;
@@ -12,7 +15,15 @@ public class UI {
     Color green_4;
     Color purple_5;
     Color red_6;
+    Color lightBlue_0_mobile;
+    Color darkBlue_1_mobile;
+    Color orange_2_mobile;
+    Color yellow_3_mobile;
+    Color green_4_mobile;
+    Color purple_5_mobile;
+    Color red_6_mobile;
     Color ghostBlockColor;
+    Color highlightColor;
     BasicStroke defaultStroke;
 
 
@@ -39,18 +50,31 @@ public class UI {
         purple_5 = new Color(161, 39, 151);
         red_6 = new Color(244, 3, 17);
         ghostBlockColor = new Color(150, 150, 150);
+        highlightColor = new Color(50, 50, 50, transparency);
+
+        lightBlue_0_mobile = new Color(0, 181, 247);
+        darkBlue_1_mobile = new Color(0, 119, 191);
+        orange_2_mobile = new Color(255, 145, 0);
+        yellow_3_mobile = new Color(255, 218, 0);
+        green_4_mobile = new Color(117, 199, 55);
+        purple_5_mobile = new Color(161, 39, 151);
+        red_6_mobile = new Color(244, 3, 17);
     }
 
     public void drawMobileBlock(Graphics2D g2d, int[] mobileBlock_x, int[] mobileBlock_y, int FRAME_SIZE, List<Integer> tetrisBlocks) {
         g2d.setStroke(defaultStroke);
         for (int i = 0; i < mobileBlock_x.length; i++) {
-            g2d.setPaint(tetrisBlocks.get(0) == 0 ? lightBlue_0 :
-                    tetrisBlocks.get(0) == 1 ? darkBlue_1 :
-                            tetrisBlocks.get(0) == 2 ? orange_2 :
-                                    tetrisBlocks.get(0) == 3 ? yellow_3 :
-                                            tetrisBlocks.get(0) == 4 ? green_4 :
-                                                    tetrisBlocks.get(0) == 5 ? purple_5 : red_6);
+            g2d.setPaint(tetrisBlocks.get(0) == 0 ? lightBlue_0_mobile
+                    : tetrisBlocks.get(0) == 1 ? darkBlue_1_mobile
+                    : tetrisBlocks.get(0) == 2 ? orange_2_mobile
+                    : tetrisBlocks.get(0) == 3 ? yellow_3_mobile
+                    : tetrisBlocks.get(0) == 4 ? green_4_mobile
+                    : tetrisBlocks.get(0) == 5 ? purple_5_mobile
+                    : red_6_mobile);
 
+            if(gamePanel.isHighlightBlock()) {
+                g2d.setPaint(highlightColor);
+            }
             g2d.fillRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
             g2d.setPaint(Color.BLACK);
             g2d.drawRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
@@ -89,12 +113,13 @@ public class UI {
                     x = i;
                 }
 
-                g2d.setPaint(blocksOnBoard[i] == 0 ? lightBlue_0 :
-                        blocksOnBoard[i] == 1 ? darkBlue_1 :
-                                blocksOnBoard[i] == 2 ? orange_2 :
-                                        blocksOnBoard[i] == 3 ? yellow_3 :
-                                                blocksOnBoard[i] == 4 ? green_4 :
-                                                        blocksOnBoard[i] == 5 ? purple_5 : red_6);
+                g2d.setPaint(blocksOnBoard[i] == 0 ? lightBlue_0
+                        : blocksOnBoard[i] == 1 ? darkBlue_1
+                        : blocksOnBoard[i] == 2 ? orange_2
+                        : blocksOnBoard[i] == 3 ? yellow_3
+                        : blocksOnBoard[i] == 4 ? green_4
+                        : blocksOnBoard[i] == 5 ? purple_5
+                        : red_6);
 
                 g2d.fillRect(x * FRAME_SIZE, y * FRAME_SIZE, FRAME_SIZE, FRAME_SIZE);
                 g2d.setPaint(Color.BLACK);
@@ -124,16 +149,33 @@ public class UI {
     public void drawNextBlock(Graphics2D g2d, int[] nextBlock_x, int[] nextBlock_y, List<Integer> tetrisBlocks) {
         g2d.setStroke(defaultStroke);
         for (int i = 0; i < nextBlock_x.length; i++) {
-            g2d.setPaint(tetrisBlocks.get(1) == 0 ? lightBlue_0 :
-                    tetrisBlocks.get(1) == 1 ? darkBlue_1 :
-                            tetrisBlocks.get(1) == 2 ? orange_2 :
-                                    tetrisBlocks.get(1) == 3 ? yellow_3 :
-                                            tetrisBlocks.get(1) == 4 ? green_4 :
-                                                    tetrisBlocks.get(1) == 5 ? purple_5 : red_6);
+            g2d.setPaint(tetrisBlocks.get(1) == 0 ? lightBlue_0
+                    : tetrisBlocks.get(1) == 1 ? darkBlue_1
+                    : tetrisBlocks.get(1) == 2 ? orange_2
+                    : tetrisBlocks.get(1) == 3 ? yellow_3
+                    : tetrisBlocks.get(1) == 4 ? green_4
+                    : tetrisBlocks.get(1) == 5 ? purple_5
+                    : red_6);
 
             g2d.fillRect(nextBlock_x[i], nextBlock_y[i], gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
             g2d.setPaint(Color.BLACK);
             g2d.drawRect(nextBlock_x[i], nextBlock_y[i], gamePanel.getFRAME_SIZE(), gamePanel.getFRAME_SIZE());
+        }
+    }
+
+    public void drawHighlightMobileBlock(Graphics2D g2d, int[] mobileBlock_x, int[] mobileBlock_y, int FRAME_SIZE, List<Integer> tetrisBlocks) {
+        if (System.currentTimeMillis() - highlightTime > gamePanel.getGameSpeed() / 25) {
+            highlightTime = System.currentTimeMillis();
+            transparency -= 10;
+            switch (tetrisBlocks.get(0)) {
+                case 0 -> highlightColor = new Color(0, 181, 247, transparency);
+                case 1 -> highlightColor = new Color(0, 119, 191, transparency);
+                case 2 -> highlightColor = new Color(255, 145, 0, transparency);
+                case 3 -> highlightColor = new Color(255, 218, 0, transparency);
+                case 4 -> highlightColor = new Color(117, 199, 55, transparency);
+                case 5 -> highlightColor = new Color(161, 39, 151, transparency);
+                case 6 -> highlightColor = new Color(244, 3, 17, transparency);
+            }
         }
     }
 }

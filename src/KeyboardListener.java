@@ -19,9 +19,9 @@ public class KeyboardListener extends KeyAdapter {
                     if (!up) {
                         up = true;
                         gamePanel.switchBlockDirection();
-                        gamePanel.collisionToRightWall(true);
-                        gamePanel.collisionToLeftWall(true);
-                        gamePanel.collisionToDownWallWhenSwitching();
+//                        gamePanel.collisionToRightWall(true);
+//                        gamePanel.collisionToLeftWall(true);
+//                        gamePanel.collisionToDownWallWhenSwitching();
                         gamePanel.collisionWithBlocksOnBoardWhenSwitching();
                         gamePanel.setPositionForGhostBlock();
                     }
