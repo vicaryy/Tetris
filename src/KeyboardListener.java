@@ -2,10 +2,13 @@ import java.awt.event.*;
 
 public class KeyboardListener extends KeyAdapter {
     GamePanel gamePanel;
+    SuperRotationSystem superRotationSystem;
     boolean up;
+    boolean z;
     boolean space;
-    KeyboardListener(GamePanel gamePanel) {
+    KeyboardListener(GamePanel gamePanel, SuperRotationSystem superRotationSystem) {
         this.gamePanel = gamePanel;
+        this.superRotationSystem = superRotationSystem;
     }
 
     @Override
@@ -15,14 +18,22 @@ public class KeyboardListener extends KeyAdapter {
                 case KeyEvent.VK_RIGHT -> gamePanel.setMoveRight(true);
                 case KeyEvent.VK_LEFT -> gamePanel.setMoveLeft(true);
                 case KeyEvent.VK_DOWN -> gamePanel.setMoveDown(true);
-                case KeyEvent.VK_UP -> {
+                case KeyEvent.VK_UP, KeyEvent.VK_X -> {
                     if (!up) {
                         up = true;
-                        gamePanel.switchBlockDirection();
-//                        gamePanel.collisionToRightWall(true);
-//                        gamePanel.collisionToLeftWall(true);
-//                        gamePanel.collisionToDownWallWhenSwitching();
-                        gamePanel.collisionWithBlocksOnBoardWhenSwitching();
+                        gamePanel.switchBlockDirectionClockwise();
+                        //gamePanel.collisionWithBlocksAndWallsWhenSwitching();
+                        superRotationSystem.SRS(gamePanel.getTetrisBlocks().get(0), gamePanel.getBlockDirection(), true);
+                        gamePanel.setPositionForGhostBlock();
+                    }
+                }
+                case KeyEvent.VK_Z -> {
+                    if (!z) {
+                        z = true;
+                        gamePanel.switchBlockDirectionCounterClockwise();
+                        //gamePanel.collisionWithBlocksAndWallsWhenSwitching();
+                        superRotationSystem.SRS(gamePanel.getTetrisBlocks().get(0), gamePanel.getBlockDirection(), false);
+
                         gamePanel.setPositionForGhostBlock();
                     }
                 }
@@ -40,7 +51,8 @@ public class KeyboardListener extends KeyAdapter {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_SPACE -> space = false;
-            case KeyEvent.VK_UP -> up = false;
+            case KeyEvent.VK_UP, KeyEvent.VK_X -> up = false;
+            case KeyEvent.VK_Z -> z = false;
             case KeyEvent.VK_DOWN -> gamePanel.setMoveDown(false);
             case KeyEvent.VK_RIGHT -> gamePanel.setMoveRight(false);
             case KeyEvent.VK_LEFT -> gamePanel.setMoveLeft(false);

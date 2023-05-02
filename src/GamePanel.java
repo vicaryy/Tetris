@@ -17,6 +17,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private LinePanel linePanel;
     private TimePanel timePanel;
     private AdditionalFeatures additionalFeatures;
+    private SuperRotationSystem superRotationSystem;
     private int GAME_PANEL_WIDTH = 400;
     private final int GAME_PANEL_HEIGHT = GAME_PANEL_WIDTH * 2;
     private final int FRAME_AMOUNT = 400;
@@ -38,7 +39,7 @@ public class GamePanel extends JPanel implements ActionListener {
     int[] ghostBlock_x = new int[4];
     int[] ghostBlock_y = new int[4];
     int[] blocksOnBoard = new int[FRAME_AMOUNT];
-    private boolean isRunning = false;
+    private boolean isRunning;
     private boolean collision;
     private boolean moveDown;
     private boolean moveRight;
@@ -56,20 +57,21 @@ public class GamePanel extends JPanel implements ActionListener {
     List<Integer> tetrisBlocks = new ArrayList<>();
     List<Integer> tetrisRows = new ArrayList<>();
     Color backgroundColor = new Color(10, 20, 20);
-    Color mainPanelColor = new Color(24,23,23);
+    Color mainPanelColor = new Color(24, 23, 23);
     Timer timer;
 
 
     GamePanel() {
         ui = new UI(this);
         blocks = new Blocks(this);
-        keyboardListener = new KeyboardListener(this);
         mainPanel = new MainPanel(this);
+        superRotationSystem = new SuperRotationSystem(this);
         nextBlockPanel = new NextBlockPanel(this, mainPanel);
         scorePanel = new ScorePanel(this, mainPanel);
         levelPanel = new LevelPanel(this, mainPanel);
         linePanel = new LinePanel(this, mainPanel);
         additionalFeatures = new AdditionalFeatures(this, mainPanel);
+        keyboardListener = new KeyboardListener(this, superRotationSystem);
 
 
         this.setBackground(backgroundColor);
@@ -89,6 +91,105 @@ public class GamePanel extends JPanel implements ActionListener {
         timer.start();
         isRunning = true;
     }
+
+    void newBlock() {
+        highlightBlock = false;
+        generatingBagOfBlocks();
+        blocks.newBlock(tetrisBlocks.get(0), FRAME_SIZE);
+        setPositionForGhostBlock();
+        checkTetris();
+    }
+    void addBlockToBoard() {
+        for (int i = 0; i < mobileBlock_y.length; i++) {
+            mobileBlock_y[i] -= FRAME_SIZE;
+            blocksOnBoard[((mobileBlock_y[i] * 10) + mobileBlock_x[i]) / FRAME_SIZE] = tetrisBlocks.get(0);
+        }
+    }
+    void switchBlockDirectionClockwise() {
+        blockDirection++;
+        if (blockDirection == 4) blockDirection = 0;
+        blocks.switchBlockDirection(mobileBlock_x, mobileBlock_y, tetrisBlocks.get(0), blockDirection, FRAME_SIZE, true);
+    }
+    void switchBlockDirectionCounterClockwise() {
+        blockDirection--;
+        if (blockDirection == -1) blockDirection = 3;
+        blocks.switchBlockDirection(mobileBlock_x, mobileBlock_y, tetrisBlocks.get(0), blockDirection, FRAME_SIZE, false);
+    }
+
+    void generatingBagOfBlocks() {
+        if (tetrisBlocks.size() != 0)
+            tetrisBlocks.remove(0);
+        if (tetrisBlocks.size() < 8) {
+            List<Integer> temporaryList = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                for (int k = 0; k < 7; k++) {
+                    temporaryList.add(k);
+                }
+                Collections.shuffle(temporaryList);
+                for (int z = 0; z < 7; z++) {
+                    tetrisBlocks.add(temporaryList.get(z));
+                }
+                temporaryList.clear();
+            }
+            Collections.fill(tetrisBlocks, 1);
+        }
+    }
+
+
+    void scoreForTetris() {
+        int rows = tetrisRows.size();
+        int points = rows == 1 ? 100 : rows == 2 ? 300 : rows == 3 ? 500 : 800;
+        score += points * level;
+        line += rows;
+        checkingLevelAndSpeed();
+    }
+    void checkTetris() {
+        boolean tetris = false;
+        for (int i = 0; i < blocksOnBoard.length; i += 10) {
+            if (blocksOnBoard[i] != -1
+                    && blocksOnBoard[i + 1] != -1
+                    && blocksOnBoard[i + 2] != -1
+                    && blocksOnBoard[i + 3] != -1
+                    && blocksOnBoard[i + 4] != -1
+                    && blocksOnBoard[i + 5] != -1
+                    && blocksOnBoard[i + 6] != -1
+                    && blocksOnBoard[i + 7] != -1
+                    && blocksOnBoard[i + 8] != -1
+                    && blocksOnBoard[i + 9] != -1) {
+                tetrisRows.add(i / 10);
+                tetris = true;
+                if (tetrisRows.size() == 4) break;
+            }
+        }
+        if (tetris) {
+            pauseForTetris = true;
+            pushBottomWallForTetris = true;
+            scoreForTetris();
+        }
+    }
+    void runningDownBlocksAfterTetris() {
+        for (int i = 0; i < tetrisRows.size(); i++) {
+            for (int k = tetrisRows.get(i) * 10; k > 0; k--) {
+                if (blocksOnBoard[k] != -1) {
+                    blocksOnBoard[k + 10] = blocksOnBoard[k];
+                    blocksOnBoard[k] = -1;
+                }
+            }
+        }
+    }
+    void resettingAfterTetris() {
+        for (int i = 0; i < tetrisRows.size(); i++) {
+            for (int k = 0; k < 10; k++) {
+                blocksOnBoard[(tetrisRows.get(i) * 10) + k] = -1;
+            }
+        }
+        runningDownBlocksAfterTetris();
+        pauseForTetris = false;
+        ui.animation = 0;
+        tetrisRows.clear();
+        setPositionForGhostBlock();
+    }
+
 
     void setPositionForGhostBlock() {
         for (int i = 0; i < mobileBlock_y.length; i++) {
@@ -126,85 +227,24 @@ public class GamePanel extends JPanel implements ActionListener {
             ghostBlock_y[i] -= FRAME_SIZE * 2;
         }
     }
-
-    void addBlockToBoard() {
-        for (int i = 0; i < mobileBlock_y.length; i++) {
-            mobileBlock_y[i] -= FRAME_SIZE;
-            blocksOnBoard[((mobileBlock_y[i] * 10) + mobileBlock_x[i]) / FRAME_SIZE] = tetrisBlocks.get(0);
+    void checkHighlightBlock() {
+        moveDown(1);
+        boolean touchWallOrBlock = checkCollisionWithBlocksAndWalls();
+        if (!highlightBlock) {
+            setHighlightBlock(true);
         }
-    }
-
-    void newBlock() {
-        highlightBlock = false;
-        generatingBlocksOrder();
-        blocks.newBlock(tetrisBlocks.get(0), FRAME_SIZE);
-        setPositionForGhostBlock();
-        checkTetris();
-    }
-
-    void generatingBlocksOrder() {
-        if(tetrisBlocks.size() != 0)
-            tetrisBlocks.remove(0);
-        if(tetrisBlocks.size() < 8){
-            List<Integer> temporaryList = new ArrayList<>();
-            for(int i = 0; i < 10; i++){
-                for(int k = 0; k < 7; k++){
-                    temporaryList.add(k);
-                }
-                Collections.shuffle(temporaryList);
-                for(int z = 0; z < 7; z++){
-                    tetrisBlocks.add(temporaryList.get(z));
-                }
-                temporaryList.clear();
-            }
+        if (!touchWallOrBlock) {
+            highlightBlock = false;
         }
+        moveUp(1);
     }
-
-    void switchBlockDirection() {
-        blockDirection++;
-        blocks.switchBlockDirection(mobileBlock_x, mobileBlock_y, tetrisBlocks.get(0), blockDirection, FRAME_SIZE);
-    }
-
-    void checkTetris() {
-        boolean tetris = false;
-        for (int i = 0; i < blocksOnBoard.length; i += 10) {
-            if (blocksOnBoard[i] != -1
-                    && blocksOnBoard[i + 1] != -1
-                    && blocksOnBoard[i + 2] != -1
-                    && blocksOnBoard[i + 3] != -1
-                    && blocksOnBoard[i + 4] != -1
-                    && blocksOnBoard[i + 5] != -1
-                    && blocksOnBoard[i + 6] != -1
-                    && blocksOnBoard[i + 7] != -1
-                    && blocksOnBoard[i + 8] != -1
-                    && blocksOnBoard[i + 9] != -1) {
-                tetrisRows.add(i / 10);
-                tetris = true;
-                if (tetrisRows.size() == 4) break;
-            }
-        }
-        if (tetris){
-            pauseForTetris = true;
-            pushBottomWallForTetris = true;
-            scoreForTetris();
-        }
-    }
-
-    void scoreForTetris(){
-        int rows = tetrisRows.size();
-        int points = rows == 1 ? 100: rows == 2 ? 300 : rows == 3 ? 500 : 800;
-        score += points * level;
-        line += rows;
-        checkingLevelAndSpeed();
-    }
-
     void checkingLevelAndSpeed() {
         if (line < 10) level = 1;
         else {
             if (level != (line / 10) + 1) {
                 level = (line / 10) + 1;
                 double defaultGameSpeed = 1000;
-                for(int i = 1; i < level; i++){
+                for (int i = 1; i < level; i++) {
                     defaultGameSpeed *= 0.9;
                 }
                 gameSpeed = defaultGameSpeed;
@@ -212,72 +252,15 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    void runningDownBlocksAfterTetris() {
-        for (int i = 0; i < tetrisRows.size(); i++) {
-            for (int k = tetrisRows.get(i) * 10; k > 0; k--) {
-                if (blocksOnBoard[k] != -1) {
-                    blocksOnBoard[k + 10] = blocksOnBoard[k];
-                    blocksOnBoard[k] = -1;
-                }
-            }
-        }
-    }
 
-    void resettingAfterTetris() {
-        for (int i = 0; i < tetrisRows.size(); i++) {
-            for (int k = 0; k < 10; k++) {
-                blocksOnBoard[(tetrisRows.get(i) * 10) + k] = -1;
-            }
-        }
-        runningDownBlocksAfterTetris();
-        pauseForTetris = false;
-        ui.animation = 0;
-        tetrisRows.clear();
-        setPositionForGhostBlock();
-    }
-
-    void checkHighlightBlock() {
-        boolean touchWallOrBlock = false;
-        moveDown();
-        int y1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-        int y2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-        int y3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-        int y4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
-
-
-        if (blocksOnBoard[y1] != -1
-                || blocksOnBoard[y2] != -1
-                || blocksOnBoard[y3] != -1
-                || blocksOnBoard[y4] != -1) {
-            touchWallOrBlock = true;
-            if (!highlightBlock) {
-                setHighlightBlock(true);
-            }
-        }
-
-        if (!touchWallOrBlock) {
-            for (int i = 0; i < mobileBlock_y.length; i++) {
-                if (mobileBlock_y[i] == GAME_PANEL_HEIGHT) {
-                    touchWallOrBlock = true;
-                    if (!highlightBlock) {
-                        setHighlightBlock(true);
-                    }
-                }
-            }
-        }
-        moveUp();
-        if(!touchWallOrBlock){
-            highlightBlock = false;
-        }
-    }
-    void collisionWithBlocksOnBoardWhenSwitching() {
-        boolean collision = false;
-
+    boolean checkCollisionWithBlocksAndWalls() {
         for (int i = 0; i < mobileBlock_y.length; i++) {
             if (mobileBlock_x[i] == -FRAME_SIZE
                     || mobileBlock_x[i] == GAME_PANEL_WIDTH
                     || mobileBlock_y[i] == GAME_PANEL_HEIGHT) {
-                collision = true;
+                if (mobileBlock_x[i] == -FRAME_SIZE) pushLeftWall = true;
+                else if (mobileBlock_x[i] == GAME_PANEL_WIDTH) pushRightWall = true;
+                return true;
             }
         }
         int x1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
@@ -289,177 +272,60 @@ public class GamePanel extends JPanel implements ActionListener {
                 || blocksOnBoard[x2] != -1
                 || blocksOnBoard[x3] != -1
                 || blocksOnBoard[x4] != -1) {
-            collision = true;
+            return true;
         }
+        return false;
+    }
+    void collisionWithBlocksAndWallsWhenSwitching() {
+        boolean collision = false;
+
+        collision = checkCollisionWithBlocksAndWalls();
 
         if (collision) {
             collision = false;
-            moveLeft();
+            moveLeft(1);
 
-            for (int i = 0; i < mobileBlock_y.length; i++) {
-                if (mobileBlock_x[i] == -FRAME_SIZE
-                        || mobileBlock_x[i] == GAME_PANEL_WIDTH
-                        || mobileBlock_y[i] == GAME_PANEL_HEIGHT) {
-                    collision = true;
-                }
-            }
-            x1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-            x2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-            x3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-            x4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
-
-            if (blocksOnBoard[x1] != -1
-                    || blocksOnBoard[x2] != -1
-                    || blocksOnBoard[x3] != -1
-                    || blocksOnBoard[x4] != -1) {
-                collision = true;
-            }
+            collision = checkCollisionWithBlocksAndWalls();
 
             if (collision) {
                 collision = false;
-                moveRight();
-                moveRight();
+                moveRight(2);
 
-                for (int i = 0; i < mobileBlock_y.length; i++) {
-                    if (mobileBlock_x[i] == -FRAME_SIZE
-                            || mobileBlock_x[i] == GAME_PANEL_WIDTH
-                            || mobileBlock_y[i] == GAME_PANEL_HEIGHT) {
-                        collision = true;
-                    }
-                }
-
-                x1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-                x2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-                x3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-                x4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
-
-                if (blocksOnBoard[x1] != -1
-                        || blocksOnBoard[x2] != -1
-                        || blocksOnBoard[x3] != -1
-                        || blocksOnBoard[x4] != -1) {
-                    collision = true;
-                }
+                collision = checkCollisionWithBlocksAndWalls();
 
                 if (collision) {
                     collision = false;
-                    moveLeft();
-                    moveUp();
+                    moveLeft(1);
+                    moveUp(1);
 
-                    for (int i = 0; i < mobileBlock_y.length; i++) {
-                        if (mobileBlock_x[i] == -FRAME_SIZE
-                                || mobileBlock_x[i] == GAME_PANEL_WIDTH
-                                || mobileBlock_y[i] == GAME_PANEL_HEIGHT) {
-                            collision = true;
-                        }
-                    }
-                    x1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-                    x2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-                    x3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-                    x4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
+                    collision = checkCollisionWithBlocksAndWalls();
 
-                    if (blocksOnBoard[x1] != -1
-                            || blocksOnBoard[x2] != -1
-                            || blocksOnBoard[x3] != -1
-                            || blocksOnBoard[x4] != -1) {
-                        collision = true;
-                    }
                     if (collision) {
-                        moveDown();
-                        for (int i = 1; i < mobileBlock_x.length; i++) {
-                            switchBlockDirection();
-                        }
+                        moveDown(1);
+                        switchBlockDirectionCounterClockwise();
                     }
                 }
             }
         }
         checkHighlightBlock();
     }
-    void collisionWithBlocksOnBoardToRight(boolean upKey) {
-        int x1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-        int x2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-        int x3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-        int x4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
-
-        if (blocksOnBoard[x1] != -1
-                || blocksOnBoard[x2] != -1
-                || blocksOnBoard[x3] != -1
-                || blocksOnBoard[x4] != -1) {
-            for (int i = 0; i < mobileBlock_x.length; i++) {
-                mobileBlock_x[i] -= FRAME_SIZE;
-                if (tetrisBlocks.get(0) == 0 && blockDirection == 0 && upKey) {
-                    mobileBlock_x[i] -= FRAME_SIZE;
+    void collisionWithBlocksAndWalls(char direction) {
+        boolean collisionWithBlocksAndWalls = checkCollisionWithBlocksAndWalls();
+        if (collisionWithBlocksAndWalls) {
+            switch (direction) {
+                case 'R' -> {
+                    moveLeft(1);
+                    //pushRightWall = true;
                 }
-            }
-        }
-    }
-    void collisionWithBlocksOnBoardToLeft(boolean upKey) {
-        int x1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-        int x2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-        int x3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-        int x4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
-
-        if (blocksOnBoard[x1] != -1
-                || blocksOnBoard[x2] != -1
-                || blocksOnBoard[x3] != -1
-                || blocksOnBoard[x4] != -1) {
-            for (int i = 0; i < mobileBlock_x.length; i++) {
-                mobileBlock_x[i] += FRAME_SIZE;
-                if (tetrisBlocks.get(0) == 0 && blockDirection == 2 && upKey) {
-                    mobileBlock_x[i] += FRAME_SIZE;
+                case 'L' -> {
+                    moveRight(1);
+                    //pushLeftWall = true;
                 }
-            }
-        }
-    }
-    void collisionWithBlocksOnBoardToDown() {
-        int y1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-        int y2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-        int y3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-        int y4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
-
-        if (blocksOnBoard[y1] != -1
-                || blocksOnBoard[y2] != -1
-                || blocksOnBoard[y3] != -1
-                || blocksOnBoard[y4] != -1) {
-            collision = true;
-            addBlockToBoard();
-            newBlock();
-        }
-    }
-    void collisionToRightWall(boolean upKey) {
-        for (int i = 0; i < mobileBlock_x.length; i++) {
-            if (mobileBlock_x[i] == GAME_PANEL_WIDTH) {
-                for (int k = 0; k < mobileBlock_x.length; k++) {
-                    mobileBlock_x[k] -= FRAME_SIZE;
-                    if (tetrisBlocks.get(0) == 0 && blockDirection == 0 && upKey) {
-                        mobileBlock_x[k] -= FRAME_SIZE;
-                    }
+                case 'D' -> {
+                    collision = true;
+                    addBlockToBoard();
+                    newBlock();
                 }
-                pushRightWall = true;
-                break;
-            }
-        }
-    }
-    void collisionToLeftWall(boolean upKey) {
-        for (int i = 0; i < mobileBlock_x.length; i++) {
-            if (mobileBlock_x[i] == -FRAME_SIZE) {
-                for (int k = 0; k < mobileBlock_x.length; k++) {
-                    mobileBlock_x[k] += FRAME_SIZE;
-                    if (tetrisBlocks.get(0) == 0 && blockDirection == 2 && upKey) {
-                        mobileBlock_x[k] += FRAME_SIZE;
-                    }
-                }
-                pushLeftWall = true;
-                break;
-            }
-        }
-    }
-    void collisionToDownWall(boolean upKey) {
-        for (int j : mobileBlock_y) {
-            if (j == GAME_PANEL_HEIGHT) {
-                collision = true;
-                addBlockToBoard();
-                newBlock();
-                break;
             }
         }
     }
@@ -468,59 +334,30 @@ public class GamePanel extends JPanel implements ActionListener {
     void automaticMoveBlockDown() {
         if (System.currentTimeMillis() - automaticMoveDownTime > gameSpeed) {
             automaticMoveDownTime = System.currentTimeMillis();
-            moveDown();
-            collisionToDownWall(false);
-            collisionWithBlocksOnBoardToDown();
+            moveDown(1);
             checkHighlightBlock();
+            collisionWithBlocksAndWalls('D');
         }
     }
     void softDrop() {
         if (System.currentTimeMillis() - softDropTime > gameSpeed / 20) {
             softDropTime = System.currentTimeMillis();
-            boolean touchWallOrBlock = false;
-
-            moveDown();
-            int y1 = ((mobileBlock_y[0] * 10) + mobileBlock_x[0]) / FRAME_SIZE;
-            int y2 = ((mobileBlock_y[1] * 10) + mobileBlock_x[1]) / FRAME_SIZE;
-            int y3 = ((mobileBlock_y[2] * 10) + mobileBlock_x[2]) / FRAME_SIZE;
-            int y4 = ((mobileBlock_y[3] * 10) + mobileBlock_x[3]) / FRAME_SIZE;
-
-
-            if (blocksOnBoard[y1] != -1
-                    || blocksOnBoard[y2] != -1
-                    || blocksOnBoard[y3] != -1
-                    || blocksOnBoard[y4] != -1) {
-                touchWallOrBlock = true;
-                if (!highlightBlock){
-                    setHighlightBlock(true);
-                }
-            }
-
-            if (!touchWallOrBlock) {
-                for (int i = 0; i < mobileBlock_y.length; i++) {
-                    if (mobileBlock_y[i] == GAME_PANEL_HEIGHT) {
-                        touchWallOrBlock = true;
-                        if (!highlightBlock){
-                            setHighlightBlock(true);
-                        }
-                    }
-                }
-            }
-            if (!touchWallOrBlock) {
+            moveDown(1);
+            boolean collisionWithBlockOrWalls = checkCollisionWithBlocksAndWalls();
+            checkHighlightBlock();
+            if (!collisionWithBlockOrWalls) {
                 score++;
                 automaticMoveDownTime = System.currentTimeMillis();
-                highlightBlock = false;
             } else {
-                moveUp();
+                moveUp(1);
             }
         }
     }
     void hardDrop() {
         collision = false;
         do {
-            moveDown();
-            collisionToDownWall(false);
-            collisionWithBlocksOnBoardToDown();
+            moveDown(1);
+            collisionWithBlocksAndWalls('D');
             score += 2;
         } while (!collision);
         pushBottomWall = true;
@@ -528,41 +365,41 @@ public class GamePanel extends JPanel implements ActionListener {
     void moveRightByKey(){
         if(System.currentTimeMillis() - moveRightTime > 130) {
             moveRightTime = System.currentTimeMillis();
-            moveRight();
-            collisionToRightWall(false);
-            collisionWithBlocksOnBoardToRight(false);
+            moveRight(1);
+            collisionWithBlocksAndWalls('R');
             setPositionForGhostBlock();
             checkHighlightBlock();
+            additionalFeatures.moveWallsByLeftRight('R');
         }
     }
     void moveLeftByKey(){
         if(System.currentTimeMillis() - moveLeftTime > 130) {
             moveLeftTime = System.currentTimeMillis();
-            moveLeft();
-            collisionToLeftWall(false);
-            collisionWithBlocksOnBoardToLeft(false);
+            moveLeft(1);
+            collisionWithBlocksAndWalls('L');
             setPositionForGhostBlock();
             checkHighlightBlock();
+            additionalFeatures.moveWallsByLeftRight('L');
         }
     }
-    void moveRight() {
+    void moveRight(int howManyTimes) {
         for (int i = 0; i < mobileBlock_x.length; i++) {
-            mobileBlock_x[i] += FRAME_SIZE;
+            mobileBlock_x[i] += FRAME_SIZE * howManyTimes;
         }
     }
-    void moveLeft() {
+    void moveLeft(int howManyTimes) {
         for (int i = 0; i < mobileBlock_x.length; i++) {
-            mobileBlock_x[i] -= FRAME_SIZE;
+            mobileBlock_x[i] -= FRAME_SIZE * howManyTimes;
         }
     }
-    void moveUp() {
+    void moveUp(int howManyTimes) {
         for(int i = 0; i < mobileBlock_y.length; i++){
-            mobileBlock_y[i] -= FRAME_SIZE;
+            mobileBlock_y[i] -= FRAME_SIZE * howManyTimes;
         }
     }
-    void moveDown(){
+    void moveDown(int howManyTimes){
         for (int i = 0; i < mobileBlock_y.length; i++) {
-            mobileBlock_y[i] += FRAME_SIZE;
+            mobileBlock_y[i] += FRAME_SIZE * howManyTimes;
         }
     }
 
@@ -572,9 +409,9 @@ public class GamePanel extends JPanel implements ActionListener {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-
-        //ui.drawNet(g2d);
-        if (highlightBlock && !pauseForTetris) ui.drawHighlightMobileBlock(g2d, mobileBlock_x, mobileBlock_y, FRAME_SIZE, tetrisBlocks);
+        ui.drawNet(g2d);
+//        if (highlightBlock && !pauseForTetris)
+//            ui.drawHighlightMobileBlock(g2d, mobileBlock_x, mobileBlock_y, FRAME_SIZE, tetrisBlocks);
 
         if (!pauseForTetris) ui.drawMobileBlock(g2d, mobileBlock_x, mobileBlock_y, FRAME_SIZE, tetrisBlocks);
 
@@ -583,14 +420,12 @@ public class GamePanel extends JPanel implements ActionListener {
         if (!pauseForTetris) ui.drawGhostBlock(g2d, ghostBlock_x, ghostBlock_y, FRAME_SIZE);
 
         if (pauseForTetris) ui.drawAnimationForTetris(g2d, tetrisRows, GAME_PANEL_WIDTH, FRAME_SIZE);
-
-
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         repaint();
-        if (!pauseForTetris) automaticMoveBlockDown();
+        //if (!pauseForTetris) automaticMoveBlockDown();
         if (pushRightWall) additionalFeatures.pushRightWall();
         if (pushLeftWall) additionalFeatures.pushLeftWall();
         if (pushBottomWall && !pushBottomWallForTetris) additionalFeatures.pushBottomWall();
@@ -599,6 +434,7 @@ public class GamePanel extends JPanel implements ActionListener {
         if (moveRight && !pauseForTetris) moveRightByKey();
         if (moveLeft && !pauseForTetris) moveLeftByKey();
     }
+
 
 
     public int getGAME_PANEL_WIDTH() {
@@ -679,5 +515,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public double getGameSpeed() {
         return gameSpeed;
+    }
+
+    public int getBlockDirection() {
+        return blockDirection;
     }
 }

@@ -44,51 +44,6 @@ public class NextBlockPanel extends JPanel {
     void settingNextBlockCords() {
         switch (gamePanel.getTetrisBlocks().get(1)) {
             case 0 -> {
-                // = = = =
-                //
-                //
-                //
-                nextBlock_x[0] = gamePanel.getFRAME_SIZE() - (gamePanel.getFRAME_SIZE() / 4) * 2;
-                nextBlock_x[1] = gamePanel.getFRAME_SIZE() * 2 - (gamePanel.getFRAME_SIZE() / 4) * 2;
-                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 3 - (gamePanel.getFRAME_SIZE() / 4) * 2;
-                nextBlock_x[3] = gamePanel.getFRAME_SIZE() * 4 - (gamePanel.getFRAME_SIZE() / 4) * 2;
-
-                nextBlock_y[0] = gamePanel.getFRAME_SIZE() * 2;
-                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2;
-                nextBlock_y[2] = gamePanel.getFRAME_SIZE() * 2;
-                nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2;
-            }
-            case 1 -> {
-                // =
-                // = = =
-                //
-                //
-                nextBlock_x[0] = gamePanel.getFRAME_SIZE();
-                nextBlock_x[1] = gamePanel.getFRAME_SIZE();
-                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 2;
-                nextBlock_x[3] = gamePanel.getFRAME_SIZE() * 3;
-
-                nextBlock_y[0] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[2] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-            }
-            case 2 -> {
-                //     =
-                // = = =
-                //
-                //
-                nextBlock_x[0] = gamePanel.getFRAME_SIZE() * 3;
-                nextBlock_x[1] = gamePanel.getFRAME_SIZE() * 3;
-                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 2;
-                nextBlock_x[3] = gamePanel.getFRAME_SIZE();
-
-                nextBlock_y[0] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[2] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-            }
-            case 3 -> {
                 // = =
                 // = =
                 //
@@ -103,22 +58,22 @@ public class NextBlockPanel extends JPanel {
                 nextBlock_y[2] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
                 nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
             }
-            case 4 -> {
-                //   = =
-                // + =
+            case 1 -> {
+                // = = = =
                 //
                 //
-                nextBlock_x[0] = gamePanel.getFRAME_SIZE();
-                nextBlock_x[1] = gamePanel.getFRAME_SIZE() * 2;
-                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 2;
-                nextBlock_x[3] = gamePanel.getFRAME_SIZE() * 3;
+                //
+                nextBlock_x[0] = gamePanel.getFRAME_SIZE() - (gamePanel.getFRAME_SIZE() / 4) * 2;
+                nextBlock_x[1] = gamePanel.getFRAME_SIZE() * 2 - (gamePanel.getFRAME_SIZE() / 4) * 2;
+                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 3 - (gamePanel.getFRAME_SIZE() / 4) * 2;
+                nextBlock_x[3] = gamePanel.getFRAME_SIZE() * 4 - (gamePanel.getFRAME_SIZE() / 4) * 2;
 
-                nextBlock_y[0] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[2] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
-                nextBlock_y[3] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[0] = gamePanel.getFRAME_SIZE() * 2;
+                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2;
+                nextBlock_y[2] = gamePanel.getFRAME_SIZE() * 2;
+                nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2;
             }
-            case 5 -> {
+            case 2 -> {
                 //   =
                 // = = 4
                 //
@@ -132,6 +87,51 @@ public class NextBlockPanel extends JPanel {
                 nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
                 nextBlock_y[2] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
                 nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+            }
+            case 3 -> {
+                //     =
+                // = = =
+                //
+                //
+                nextBlock_x[0] = gamePanel.getFRAME_SIZE() * 3;
+                nextBlock_x[1] = gamePanel.getFRAME_SIZE() * 3;
+                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 2;
+                nextBlock_x[3] = gamePanel.getFRAME_SIZE();
+
+                nextBlock_y[0] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[2] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+            }
+            case 4 -> {
+                // =
+                // = = =
+                //
+                //
+                nextBlock_x[0] = gamePanel.getFRAME_SIZE();
+                nextBlock_x[1] = gamePanel.getFRAME_SIZE();
+                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 2;
+                nextBlock_x[3] = gamePanel.getFRAME_SIZE() * 3;
+
+                nextBlock_y[0] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[2] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[3] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+            }
+            case 5 -> {
+                //   = =
+                // + =
+                //
+                //
+                nextBlock_x[0] = gamePanel.getFRAME_SIZE();
+                nextBlock_x[1] = gamePanel.getFRAME_SIZE() * 2;
+                nextBlock_x[2] = gamePanel.getFRAME_SIZE() * 2;
+                nextBlock_x[3] = gamePanel.getFRAME_SIZE() * 3;
+
+                nextBlock_y[0] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[1] = gamePanel.getFRAME_SIZE() * 2 + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[2] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
+                nextBlock_y[3] = gamePanel.getFRAME_SIZE() + gamePanel.getFRAME_SIZE()/2;
             }
             case 6 -> {
                 // = =
