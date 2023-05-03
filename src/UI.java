@@ -56,15 +56,13 @@ public class UI {
                     : tetrisBlocks.get(0) == 5 ? green_5
                     : red_6);
 
-            if(gamePanel.isHighlightBlock()) {
+            if (gamePanel.isHighlightBlock()) {
                 g2d.setPaint(highlightColor);
             }
             g2d.fillRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
             g2d.setPaint(Color.BLACK);
             g2d.drawRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
         }
-        g2d.setPaint(Color.CYAN);
-        g2d.fillRect(mobileBlock_x[0], mobileBlock_y[0], FRAME_SIZE, FRAME_SIZE);
     }
 
     public void drawNet(Graphics2D g2d) {
@@ -154,12 +152,12 @@ public class UI {
             highlightTime = System.currentTimeMillis();
             transparency -= 10;
             switch (tetrisBlocks.get(0)) {
-                case 0 -> highlightColor = new Color(0, 181, 247, transparency);
-                case 1 -> highlightColor = new Color(0, 119, 191, transparency);
-                case 2 -> highlightColor = new Color(255, 145, 0, transparency);
-                case 3 -> highlightColor = new Color(255, 218, 0, transparency);
-                case 4 -> highlightColor = new Color(117, 199, 55, transparency);
-                case 5 -> highlightColor = new Color(161, 39, 151, transparency);
+                case 0 -> highlightColor = new Color(255, 218, 0, transparency);
+                case 1 -> highlightColor = new Color(0, 181, 247, transparency);
+                case 2 -> highlightColor = new Color(161, 39, 151, transparency);
+                case 3 -> highlightColor = new Color(255, 145, 0, transparency);
+                case 4 -> highlightColor = new Color(0, 119, 191, transparency);
+                case 5 -> highlightColor = new Color(117, 199, 55, transparency);
                 case 6 -> highlightColor = new Color(244, 3, 17, transparency);
             }
         }

@@ -21,8 +21,6 @@ public class KeyboardListener extends KeyAdapter {
                 case KeyEvent.VK_UP, KeyEvent.VK_X -> {
                     if (!up) {
                         up = true;
-                        gamePanel.switchBlockDirectionClockwise();
-                        //gamePanel.collisionWithBlocksAndWallsWhenSwitching();
                         superRotationSystem.SRS(gamePanel.getTetrisBlocks().get(0), gamePanel.getBlockDirection(), true);
                         gamePanel.setPositionForGhostBlock();
                     }
@@ -30,10 +28,7 @@ public class KeyboardListener extends KeyAdapter {
                 case KeyEvent.VK_Z -> {
                     if (!z) {
                         z = true;
-                        gamePanel.switchBlockDirectionCounterClockwise();
-                        //gamePanel.collisionWithBlocksAndWallsWhenSwitching();
                         superRotationSystem.SRS(gamePanel.getTetrisBlocks().get(0), gamePanel.getBlockDirection(), false);
-
                         gamePanel.setPositionForGhostBlock();
                     }
                 }
@@ -43,6 +38,7 @@ public class KeyboardListener extends KeyAdapter {
                         gamePanel.hardDrop();
                     }
                 }
+                //case KeyEvent.VK_SHIFT -> gamePanel.moveUp(1);
             }
         }
     }
