@@ -4,9 +4,11 @@ import java.util.List;
 public class UI {
     GamePanel gamePanel;
     int animation = 0;
-    int transparency = 200;
+    int transparencyForHighlightBlock = 255;
+    int transparencyForTSpin = 30;
     long currentTime = System.currentTimeMillis();
     long highlightTime = System.currentTimeMillis();
+    long tSpinTime = System.currentTimeMillis();
     Color lightBlue_1;
     Color darkBlue_4;
     Color orange_3;
@@ -16,6 +18,7 @@ public class UI {
     Color red_6;
     Color ghostBlockColor;
     Color highlightColor;
+    Color tSpinColor;
     BasicStroke defaultStroke;
 
 
@@ -42,7 +45,8 @@ public class UI {
         green_5 = new Color(117, 199, 55);
         red_6 = new Color(244, 3, 17);
         ghostBlockColor = new Color(150, 150, 150);
-        highlightColor = new Color(50, 50, 50, transparency);
+        highlightColor = new Color(50, 50, 50, transparencyForHighlightBlock);
+        tSpinColor = new Color(255, 255, 255, transparencyForTSpin);
     }
 
     public void drawMobileBlock(Graphics2D g2d, int[] mobileBlock_x, int[] mobileBlock_y, int FRAME_SIZE, List<Integer> tetrisBlocks) {
@@ -62,6 +66,12 @@ public class UI {
             g2d.fillRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
             g2d.setPaint(Color.BLACK);
             g2d.drawRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
+
+            //TSPIN
+//            g2d.setPaint(Color.CYAN);
+//            g2d.drawRect(gamePanel.tSpin_x[i], gamePanel.tSpin_y[i], FRAME_SIZE, FRAME_SIZE);
+//            g2d.setFont(new Font("Helvetica Neue", Font.PLAIN,20));
+//            g2d.drawString(i==0 ? "A" : i==1 ? "B" : i==2 ? "C" : "D", gamePanel.tSpin_x[i]+13, gamePanel.tSpin_y[i]+28);
         }
     }
 
@@ -130,6 +140,23 @@ public class UI {
             gamePanel.resettingAfterTetris();
     }
 
+    public void drawAnimationForTSpin(Graphics2D g2d, int FRAME_SIZE, int[] mobileBlock_x, int[] mobileBlock_y) {
+            tSpinColor = new Color(250, 250, 250, transparencyForTSpin);
+            for (int i = 0; i < mobileBlock_x.length; i++) {
+                g2d.setPaint(tSpinColor);
+                g2d.fillRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
+                g2d.setPaint(Color.BLACK);
+                g2d.drawRect(mobileBlock_x[i], mobileBlock_y[i], FRAME_SIZE, FRAME_SIZE);
+            }
+        if (System.currentTimeMillis() - tSpinTime > 10) {
+            tSpinTime = System.currentTimeMillis();
+            transparencyForTSpin += 10;
+        }
+        if(transparencyForTSpin == 250){
+            gamePanel.animationForTSpin = false;
+        }
+    }
+
     public void drawNextBlock(Graphics2D g2d, int[] nextBlock_x, int[] nextBlock_y, List<Integer> tetrisBlocks) {
         g2d.setStroke(defaultStroke);
         for (int i = 0; i < nextBlock_x.length; i++) {
@@ -150,15 +177,15 @@ public class UI {
     public void drawHighlightMobileBlock(Graphics2D g2d, int[] mobileBlock_x, int[] mobileBlock_y, int FRAME_SIZE, List<Integer> tetrisBlocks) {
         if (System.currentTimeMillis() - highlightTime > gamePanel.getGameSpeed() / 25) {
             highlightTime = System.currentTimeMillis();
-            transparency -= 10;
+            transparencyForHighlightBlock -= 10;
             switch (tetrisBlocks.get(0)) {
-                case 0 -> highlightColor = new Color(255, 218, 0, transparency);
-                case 1 -> highlightColor = new Color(0, 181, 247, transparency);
-                case 2 -> highlightColor = new Color(161, 39, 151, transparency);
-                case 3 -> highlightColor = new Color(255, 145, 0, transparency);
-                case 4 -> highlightColor = new Color(0, 119, 191, transparency);
-                case 5 -> highlightColor = new Color(117, 199, 55, transparency);
-                case 6 -> highlightColor = new Color(244, 3, 17, transparency);
+                case 0 -> highlightColor = new Color(255, 218, 0, transparencyForHighlightBlock);
+                case 1 -> highlightColor = new Color(0, 181, 247, transparencyForHighlightBlock);
+                case 2 -> highlightColor = new Color(161, 39, 151, transparencyForHighlightBlock);
+                case 3 -> highlightColor = new Color(255, 145, 0, transparencyForHighlightBlock);
+                case 4 -> highlightColor = new Color(0, 119, 191, transparencyForHighlightBlock);
+                case 5 -> highlightColor = new Color(117, 199, 55, transparencyForHighlightBlock);
+                case 6 -> highlightColor = new Color(244, 3, 17, transparencyForHighlightBlock);
             }
         }
     }

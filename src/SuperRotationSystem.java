@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class SuperRotationSystem {
     GamePanel gamePanel;
 
@@ -296,6 +298,7 @@ public class SuperRotationSystem {
                 //   =
                 // = = 4
                 //
+                boolean checkTSpin = true;
                 switch (blockDirection) {
                     case 0 -> {
                         //NORTH
@@ -321,10 +324,12 @@ public class SuperRotationSystem {
                                         gamePanel.moveUp(2);
                                         if (clockwise) gamePanel.switchBlockDirectionCounterClockwise();
                                         else gamePanel.switchBlockDirectionClockwise();
+                                        checkTSpin = false;
                                     }
                                 }
                             }
                         }
+                        if(checkTSpin) gamePanel.tSpinCollision();
                     }
 
                     case 1 -> {
@@ -354,11 +359,13 @@ public class SuperRotationSystem {
                                             gamePanel.moveDown(2);
                                             if (clockwise) gamePanel.switchBlockDirectionCounterClockwise();
                                             else gamePanel.switchBlockDirectionClockwise();
+                                            checkTSpin = false;
                                         }
                                     }
                                 }
                             }
                         }
+                        if(checkTSpin) gamePanel.tSpinCollision();
                     }
 
                     case 2 -> {
@@ -388,10 +395,12 @@ public class SuperRotationSystem {
                                         gamePanel.moveUp(2);
                                         if (clockwise) gamePanel.switchBlockDirectionCounterClockwise();
                                         else gamePanel.switchBlockDirectionClockwise();
+                                        checkTSpin = false;
                                     }
                                 }
                             }
                         }
+                        if(checkTSpin) gamePanel.tSpinCollision();
                     }
 
                     case 3 -> {
@@ -421,11 +430,13 @@ public class SuperRotationSystem {
                                             gamePanel.moveDown(2);
                                             if (clockwise) gamePanel.switchBlockDirectionCounterClockwise();
                                             else gamePanel.switchBlockDirectionClockwise();
+                                            checkTSpin = false;
                                         }
                                     }
                                 }
                             }
                         }
+                        if(checkTSpin) gamePanel.tSpinCollision();
                     }
                 }
             }

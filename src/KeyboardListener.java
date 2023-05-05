@@ -13,7 +13,7 @@ public class KeyboardListener extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (!gamePanel.pauseForTetris) {
+        if (!gamePanel.isTetris) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_RIGHT -> gamePanel.setMoveRight(true);
                 case KeyEvent.VK_LEFT -> gamePanel.setMoveLeft(true);
